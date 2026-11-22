@@ -19,6 +19,10 @@ Site brasileiro (pt-BR) de **intermediação entre famílias e cuidadores** de i
 - `scripts/build.mjs` injeta as variáveis no `index.html` (placeholders `%%NOME%%`) e gera `dist/`. **Nunca edite valores direto no index.html.**
 - Hospedagem: Vercel (`vercel.json`: build, `dist`, cabeçalhos de segurança e CSP). `public/` = og.png, robots.txt, sitemap.xml.
 
+## Login (callback)
+- Login por link mágico com **PKCE**. O e-mail aponta para `/auth/callback?next=<rota>` (`public/auth/callback.html`), que troca o `?code=` por sessão (`exchangeCodeForSession`) e redireciona para `/#<rota>`. `next` só aceita rotas internas conhecidas (sem open redirect). Erro/link expirado mostra mensagem e link de volta.
+- Precisa de `https://<site>/auth/callback` em Supabase > Authentication > Redirect URLs. O link deve ser aberto no mesmo navegador que o pediu (verificador PKCE fica no localStorage).
+
 ## Variáveis de ambiente (veja `.env.example`)
 Obrigatórias: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PIX_KEY`, `WHATSAPP`, `SITE_URL`. Com padrão: `PIX_NAME`, `PIX_CITY`, `FEE_RATE`=0.15. Opcionais: `PAYMENT_LINK`, `CONTACT_EMAIL`. Build de produção (`VERCEL_ENV=production` ou `STRICT=1`) falha se faltar alguma obrigatória.
 

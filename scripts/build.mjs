@@ -65,9 +65,16 @@ fs.rmSync(out, { recursive: true, force: true });
 fs.mkdirSync(out);
 fs.writeFileSync(path.join(out, 'index.html'), html);
 const pub = path.join(root, 'public');
-if (fs.existsSync(pub)) for (const f of fs.readdirSync(pub)) {
-  let c = fs.readFileSync(path.join(pub, f));
-  if (/\.(txt|xml)$/.test(f)) c = Buffer.from(c.toString().replace(/%%SITE_URL%%/g, v.SITE_URL || 'https://example.invalid'));
-  fs.writeFileSync(path.join(out, f), c);
-}
+const copy = (src, dst) => {
+  fs.mkdirSync(dst, { recursive: true });
+  for (const e of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, e.name), d = path.join(dst, e.name);
+    if (e.isDirectory()) { copy(s, d); continue; }
+    let c = fs.readFileSync(s);
+    if (/\.(txt|xml)$/.test(e.name)) c = Buffer.from(c.toString().replace(/%%SITE_URL%%/g, v.SITE_URL || 'https://example.invalid'));
+    if (/\.html$/.test(e.name)) c = Buffer.from(c.toString().replace(/%%([A-Z_]+)%%/g, (m, k) => { if (!(k in map)) throw new Error('placeholder desconhecido ' + m); return map[k]; }));
+    fs.writeFileSync(d, c);
+  }
+};
+if (fs.existsSync(pub)) copy(pub, out);
 console.log(`build ok -> dist/ (${(html.length / 1024).toFixed(1)} KB)${errs.length ? ' [com avisos]' : ''}`);

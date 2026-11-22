@@ -26,6 +26,15 @@ const known = fs.readFileSync(path.join(root, 'scripts/build.mjs'), 'utf8');
 for (const m of new Set([...html.matchAll(/%%([A-Z_]+)%%/g)].map((x) => x[1]))) if (!known.includes(m)) fail('build não trata %%' + m + '%%');
 // SEO mínimo
 for (const [n, r] of [['title', /<title>[^<]{10,}/], ['meta description', /name="description" content="[^"]{50,}/], ['og:title', /property="og:title"/], ['og:description', /property="og:description"/], ['og:image', /property="og:image"/], ['canonical', /rel="canonical"/], ['lang pt-BR', /<html lang="pt-BR"/], ['viewport', /name="viewport"/]]) if (!r.test(html)) fail('SEO: falta ' + n);
+const cbp = path.join(root, 'public/auth/callback.html');
+if (!fs.existsSync(cbp)) fail('falta public/auth/callback.html');
+else {
+  const cb = fs.readFileSync(cbp, 'utf8');
+  fs.writeFileSync(path.join(tmp, 'cb.js'), [...cb.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n'));
+  try { execFileSync(process.execPath, ['--check', path.join(tmp, 'cb.js')], { stdio: 'pipe' }); console.log('✓ callback.html: sintaxe ok'); } catch (e) { fail('callback.html: erro de sintaxe\n' + e.stderr); }
+  if (!/exchangeCodeForSession/.test(cb)) fail('callback.html não troca o code por sessão');
+  if (!/auth\/callback/.test(html)) fail('index.html não aponta emailRedirectTo para /auth/callback');
+}
 fs.rmSync(tmp, { recursive: true, force: true });
 if (bad) { console.error(`\n${bad} problema(s)`); process.exit(1); }
 console.log('✓ rotas, handlers, placeholders e SEO ok');

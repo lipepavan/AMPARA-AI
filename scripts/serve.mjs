@@ -5,7 +5,8 @@ const port = Number(process.env.PORT) || 4173;
 const types = { '.html': 'text/html; charset=utf-8', '.png': 'image/png', '.txt': 'text/plain', '.xml': 'application/xml', '.svg': 'image/svg+xml' };
 http.createServer((q, r) => {
   let p = decodeURIComponent(new URL(q.url, 'http://x').pathname); if (p.endsWith('/')) p += 'index.html';
-  const f = path.join(dir, path.normalize(p));
+  let f = path.join(dir, path.normalize(p));
+  if (!fs.existsSync(f) && fs.existsSync(f + '.html')) f += '.html';
   if (!f.startsWith(dir) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end('404'); }
   r.writeHead(200, { 'content-type': types[path.extname(f)] || 'application/octet-stream' }); fs.createReadStream(f).pipe(r);
 }).listen(port, () => console.log(`preview em http://localhost:${port}`));

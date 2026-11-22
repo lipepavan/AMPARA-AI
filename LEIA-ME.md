@@ -8,7 +8,7 @@ Arquivos: `index.html` (o site), `schema.sql` (banco), `scripts/` (build, lint, 
 1. Crie conta em supabase.com e um projeto novo.
 2. SQL Editor > New query > cole o `schema.sql` > Run.
 3. Settings > API: copie **Project URL** e a chave **anon public**.
-4. Authentication > URL Configuration: em *Site URL* coloque o endereço final do site.
+4. Authentication > URL Configuration: em *Site URL* coloque o endereço final do site e, em *Redirect URLs*, adicione `https://SEU-SITE/auth/callback` (sem isso o link do e-mail não volta para o site).
 5. Authentication > SMTP: configure um e-mail próprio (Resend, Brevo...). O envio padrão do Supabase tem limite baixo.
 
 ## 2. Configurar o site (variáveis de ambiente — não edite o index.html)

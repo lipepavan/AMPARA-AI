@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#0f2438">
+<title>Entrando — AMPARA AI</title>
+<style>
+:root{--bg:#f7f5f0;--ink:#1c2a33;--mut:#5f6b74;--btn:#0d7a66;--coral:#c4521f}
+@media(prefers-color-scheme:dark){:root{--bg:#11181d;--ink:#eef0ee;--mut:#9aa4a9;--btn:#16806b;--coral:#f08a5a}}
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:420px;padding:24px;text-align:center}
+h1{font-size:22px;margin:0 0 8px}p{color:var(--mut);margin:6px 0}
+.btn{display:inline-block;margin-top:14px;background:var(--btn);color:#fff;text-decoration:none;font-weight:600;border-radius:12px;padding:12px 20px}
+.err{color:var(--coral)}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+<main>
+<h1 id="t">♥ AMPARA AI</h1>
+<p id="m">Confirmando seu acesso…</p>
+<a id="b" class="btn" href="/" hidden>Voltar ao início</a>
+</main>
+<script>
+/* Callback do login por e-mail (Supabase PKCE): troca o ?code= por uma sessão e leva o usuário ao destino. */
+const CFG={url:'%%SUPABASE_URL%%',key:'%%SUPABASE_ANON_KEY%%'};
+(async()=>{
+ const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));
+ const next=q.get('next')||'';
+ /* só aceita rotas internas conhecidas: evita redirecionamento para outro site */
+ const dest='/#'+(/^(inicio|buscar|cuidador|minhas|contrat\/[0-9a-fA-F-]{36})$/.test(next)?next:'minhas');
+ const fail=(msg)=>{document.getElementById('t').textContent='Não foi possível entrar';
+  const m=document.getElementById('m');m.textContent=msg;m.className='err';document.getElementById('b').hidden=false};
+ if(q.get('error')||h.get('error')||q.get('error_description')||h.get('error_description'))return fail('O link expirou ou já foi usado. Volte ao site e peça um novo.');
+ if(typeof supabase==='undefined'||!/^https:\/\//.test(CFG.url)||CFG.key.length<20)return fail('Serviço indisponível no momento. Tente novamente em instantes.');
+ const sb=supabase.createClient(CFG.url,CFG.key,{auth:{flowType:'pkce',detectSessionInUrl:false}});
+ const code=q.get('code');
+ let ok=false;
+ if(code){const r=await sb.auth.exchangeCodeForSession(code);ok=!r.error}
+ if(!ok){const s=(await sb.auth.getSession()).data.session;ok=!!s}
+ if(!ok)return fail('Link inválido ou aberto em outro aparelho/navegador. Peça um novo link e abra-o no mesmo aparelho em que pediu.');
+ location.replace(dest);
+})();
+</script>
+</body>
+</html>
