@@ -75,6 +75,8 @@ footer a{color:var(--td);font-weight:600}
 .doc h3{margin:18px 0 4px;font-size:16px}.doc p{margin:4px 0}
 
 h3.s{margin:20px 0 2px;font-size:16px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:30;background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;max-width:90vw;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.pw{position:relative}.pw input{padding-right:92px}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--td);font:600 13px/1 inherit;font-family:inherit;padding:10px;cursor:pointer}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
@@ -85,6 +87,7 @@ h3.s{margin:20px 0 2px;font-size:16px}
 <main id="app"></main>
 <footer>A AMPARA AI apenas aproxima famílias e cuidadores. Não é empregadora e não recebe nem repassa o pagamento do serviço, que é pago direto ao cuidador, depois de realizado. Dados tratados conforme a LGPD. <a href="#termos">Termos de uso</a> · <a href="#privacidade">Privacidade</a>%%FOOTER_CONTACT%%</footer>
 <div id="modal" class="ov" hidden></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <script>
 /* ===== CONFIGURAÇÃO: NÃO edite aqui. Os valores vêm das variáveis de ambiente no build (veja .env.example) ===== */
 const CFG={url:'%%SUPABASE_URL%%',key:'%%SUPABASE_ANON_KEY%%',pix:'%%PIX_KEY%%',link:'%%PAYMENT_LINK%%',nome:'%%PIX_NAME%%',cidade:'%%PIX_CITY%%',rate:Number('%%FEE_RATE%%')||0.15,wa:'%%WHATSAPP%%',mail:'%%CONTACT_EMAIL%%'};
@@ -239,33 +242,51 @@ async function cad(ev){ev.preventDefault();const E=$('#err');E.textContent='';
 
 function ask(msg){const m=$('#modal');m.hidden=false;
  m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 6px">Entrar ou criar conta</h3><p class="mut">${msg}</p>
-<form onsubmit="login(event)"><label for="le">Seu e-mail</label><input id="le" type="email" autocomplete="email" required>
-<label for="lp">Senha (mínimo 8 caracteres)</label><input id="lp" type="password" autocomplete="current-password" minlength="8" required>
+<form onsubmit="login(event)" novalidate><label for="le">Seu e-mail</label><input id="le" type="email" autocomplete="email" required>
+<label for="lp">Senha (mínimo 8 caracteres)</label><div class="pw"><input id="lp" type="password" autocomplete="current-password" minlength="8" required><button type="button" class="eye" onclick="tpw(this)" aria-label="Mostrar ou ocultar a senha" aria-pressed="false">Mostrar</button></div>
 <div class="err" id="lerr"></div>
-<button class="btn" type="submit">Entrar</button>
-<button class="btn alt" type="button" onclick="signup()">Criar conta</button></form>
+<button class="btn" type="submit" id="blogin">Entrar</button>
+<button class="btn alt" type="button" id="bsignup" onclick="signup()">Criar conta</button></form>
 <p class="mut" style="text-align:center"><a href="#" onclick="forgot(event)" style="color:var(--td)">Esqueci minha senha</a></p>
 <p class="mut">Ao criar a conta você concorda com os <a href="#termos" onclick="$('#modal').hidden=true" style="color:var(--td)">Termos</a> e a <a href="#privacidade" onclick="$('#modal').hidden=true" style="color:var(--td)">Privacidade</a>.</p>
 <button class="btn alt" type="button" onclick="$('#modal').hidden=true">Fechar</button></div>`}
 const lmsg=(t,ok)=>{const e=$('#lerr');if(!e)return;e.style.color=ok?'var(--td)':'';e.textContent=t};
-const lerr=e=>/invalid login/i.test(e.message)?'E-mail ou senha incorretos.':/rate|too many|seconds/i.test(e.message)?'Muitas tentativas. Aguarde um minuto e tente de novo.':/weak|short|least/i.test(e.message)?'Senha muito fraca. Use pelo menos 8 caracteres.':'Não foi possível concluir. Tente novamente.';
+const EXISTE='Este e-mail já tem conta. Toque em "Entrar" e use a sua senha. Se você nunca criou uma senha, toque em "Esqueci minha senha".';
+const lerr=e=>{const m=e.message||'';
+ return /invalid login/i.test(m)?'E-mail ou senha incorretos. Se você ainda não criou uma senha, toque em "Esqueci minha senha".'
+ :/already|registered|exists/i.test(m)?EXISTE
+ :/signups? (not allowed|disabled)|disabled/i.test(m)?'Novos cadastros estão desativados no Supabase (Authentication > Sign In / Providers).'
+ :/rate|too many|seconds/i.test(m)?'Muitas tentativas. Aguarde um minuto e tente de novo.'
+ :/weak|short|least/i.test(m)?'Senha muito fraca. Use pelo menos 8 caracteres.'
+ :'Não foi possível concluir ('+m+').'};
+function tpw(b){const i=b.previousElementSibling,v=i.type=='password';i.type=v?'text':'password';b.textContent=v?'Ocultar':'Mostrar';b.setAttribute('aria-pressed',v)}
 function cred(){
  if(!OK){lmsg('Site ainda não configurado.');return null}
  const email=$('#le').value.trim(),password=$('#lp').value;
  if(!/^\S+@\S+\.\S+$/.test(email)){lmsg('Informe um e-mail válido.');return null}
  if(password.length<8){lmsg('A senha precisa ter pelo menos 8 caracteres.');return null}
  return{email,password}}
+function toast(t){const e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>{e.hidden=true},5000)}
+let busy=false;
+async function run(id,fn){
+ if(busy)return;const btn=$(id);busy=true;const old=btn.textContent;btn.disabled=true;btn.textContent='Aguarde…';lmsg('');
+ try{await Promise.race([fn(),new Promise((_,no)=>setTimeout(()=>no(new Error('timeout')),20000))])}
+ catch(e){lmsg(e.message=='timeout'?'O servidor não respondeu. Verifique sua internet e tente de novo.':'Falha de conexão com o servidor. Verifique sua internet e tente de novo.')}
+ finally{busy=false;if(btn.isConnected){btn.disabled=false;btn.textContent=old}}}
+function entrou(msg){$('#modal').hidden=true;toast(msg)}
 async function login(ev){ev.preventDefault();const c=cred();if(!c)return;
- const r=await sb.auth.signInWithPassword(c);
- if(r.error){lmsg(/not confirmed/i.test(r.error.message)?'Confirme o link enviado ao seu e-mail para entrar.':lerr(r.error));return}
- $('#modal').hidden=true}
+ await run('#blogin',async()=>{
+  const r=await sb.auth.signInWithPassword(c);
+  if(r.error){lmsg(/not confirmed/i.test(r.error.message)?'Confirme o link enviado ao seu e-mail para entrar.':lerr(r.error));return}
+  entrou('Conectado como '+c.email)})}
 async function signup(){const c=cred();if(!c)return;
- const r=await sb.auth.signUp(c);
- if(r.error){lmsg(lerr(r.error));return}
- if(!r.data.session){
-  const l=await sb.auth.signInWithPassword(c);
-  if(l.error){lmsg(/not confirmed/i.test(l.error.message)?'Conta criada. Confirme o link enviado ao seu e-mail para entrar.':'Este e-mail já tem conta. Toque em "Entrar" e use a sua senha.');return}}
- $('#modal').hidden=true}
+ await run('#bsignup',async()=>{
+  const r=await sb.auth.signUp(c);
+  if(r.error){lmsg(lerr(r.error));return}
+  if(!r.data.session){
+   const l=await sb.auth.signInWithPassword(c);
+   if(l.error){lmsg(/not confirmed/i.test(l.error.message)?'Conta criada. Abra o link enviado ao seu e-mail para confirmar e entrar. (Para entrar direto, desligue "Confirm email" no Supabase.)':EXISTE);return}}
+  entrou('Conta criada! Você já está conectado como '+c.email)})}
 async function forgot(ev){ev.preventDefault();
  const email=$('#le').value.trim();
  if(!OK||!/^\S+@\S+\.\S+$/.test(email)){lmsg('Digite seu e-mail acima e toque de novo.');return}
@@ -273,7 +294,7 @@ async function forgot(ev){ev.preventDefault();
  lmsg(r.error?'Não foi possível enviar. Tente novamente.':'Se o e-mail tiver conta, enviamos um link para criar uma nova senha.',!r.error)}
 function senha(){
  if(!sess)return '<h2>Nova senha</h2><div class="card"><p>Abra o link de recuperação enviado ao seu e-mail.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
- return `<h2>Criar nova senha</h2><form class="card" onsubmit="nsenha(event)"><label for="ns">Nova senha (mínimo 8 caracteres)</label><input id="ns" type="password" minlength="8" required autocomplete="new-password"><div class="err" id="err"></div><button class="btn" type="submit">Salvar senha</button></form>`}
+ return `<h2>Criar nova senha</h2><form class="card" onsubmit="nsenha(event)"><label for="ns">Nova senha (mínimo 8 caracteres)</label><div class="pw"><input id="ns" type="password" minlength="8" required autocomplete="new-password"><button type="button" class="eye" onclick="tpw(this)" aria-label="Mostrar ou ocultar a senha" aria-pressed="false">Mostrar</button></div><div class="err" id="err"></div><button class="btn" type="submit">Salvar senha</button></form>`}
 async function nsenha(ev){ev.preventDefault();
  const r=await sb.auth.updateUser({password:$('#ns').value});
  if(r.error){$('#err').textContent=lerr(r.error);return}

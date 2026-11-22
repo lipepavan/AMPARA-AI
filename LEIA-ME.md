@@ -30,3 +30,7 @@ Copie `.env.example` para `.env` (local) ou cadastre as mesmas variáveis na Ver
 - As páginas `#termos` e `#privacidade` já existem, mas são texto-base: peça revisão a um advogado (LGPD).
 - Regularização fiscal da atividade (MEI/CNPJ e nota fiscal) com o seu contador.
 - Ainda não existem pelo site: avaliação por estrelas, renovação de certidão pelo cuidador e pagamento automático.
+
+## Problemas de login
+- "E-mail ou senha incorretos" para um e-mail que você nunca cadastrou com senha: a conta pode ter sido criada antes, por link de e-mail, sem senha. Solução: Supabase > Authentication > Users > ⋯ > Delete user e criar de novo no site, ou usar "Esqueci minha senha".
+- "Abra o link enviado ao seu e-mail" ao criar conta: o *Confirm email* ainda está ligado no Supabase. Desligue em Authentication > Sign In / Providers > Email.
