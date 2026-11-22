@@ -9,7 +9,7 @@ Site brasileiro (pt-BR) de **intermediação entre famílias e cuidadores** de i
 - Após o Pix confirmado, a AMPARA AI faz a intermediação **em até 2 horas**: o dono chama o cuidador, e quando ele aceita marca `confirmada`.
 - **O contato (telefone/e-mail/endereço) do cuidador NUNCA aparece no site.** Toda comunicação passa pela AMPARA AI.
 - Cadastro do cuidador: dados pessoais, especialidades (enfermeiro(a), técnico em enfermagem, cuidador com curso, cuidador com experiência, acompanhante hospitalar, cuidados paliativos), COREN (se enfermeiro/técnico), endereço completo, **RG e comprovante de endereço obrigatórios; certidão de antecedentes OPCIONAL** (validade de 30 dias).
-- Só cuidadores `verificado` aparecem na busca. **Não criar perfis de demonstração** no site real.
+- **Acesso imediato (decidido pelo dono em 22/11/2026):** cuidador aparece na busca assim que se cadastra (`status='ativo'`). `verificado` é só um selo opcional que o dono concede após conferir documentos; `reprovado` esconde o perfil. Nunca exibir o selo "Verificado" para perfil `ativo`. **Não criar perfis de demonstração** no site real.
 - Pix: chave tipo telefone do dono, gerada em BRCode estático (já implementado em `index.html`, funções `brcode`/`pixm`).
 
 ## Stack e estrutura

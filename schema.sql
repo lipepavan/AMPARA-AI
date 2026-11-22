@@ -7,7 +7,7 @@ create table cuidadores(
   nome text not null, cidade text not null, esp text[] not null,
   exp int not null default 0, bio text, coren text,
   p_hora numeric, p_8 numeric, p_12 numeric, p_24 numeric,
-  status text not null default 'pendente' check (status in ('pendente','verificado','reprovado')),
+  status text not null default 'ativo' check (status in ('ativo','pendente','verificado','reprovado')),
   certidao_em date default current_date,
   created_at timestamptz default now());
 create table cuidadores_contato(
@@ -36,9 +36,10 @@ alter table cuidadores enable row level security;
 alter table cuidadores_contato enable row level security;
 alter table contratacoes enable row level security;
 
--- Público só vê cuidadores verificados, sem contato, endereço ou documentos
-create policy "ver verificados" on cuidadores for select using (status='verificado');
-create policy "cadastro livre" on cuidadores for insert with check (status='pendente');
+-- Público vê cuidadores ativos/verificados, sem contato, endereço ou documentos
+-- Cadastro com acesso imediato: perfil 'ativo' já aparece na busca. 'verificado' = selo opcional dado por você; 'reprovado' esconde o perfil.
+create policy "ver ativos" on cuidadores for select using (status in ('ativo','verificado'));
+create policy "cadastro livre" on cuidadores for insert with check (status='ativo');
 create policy "enviar contato" on cuidadores_contato for insert with check (true);
 -- Contato, endereço e documentos do cuidador: ninguém lê pelo site, só você, no painel
 -- Cada família vê e cria só as suas contratações; "pago" e "confirmada" só são alterados por você, no painel
