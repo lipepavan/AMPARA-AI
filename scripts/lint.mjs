@@ -9,7 +9,7 @@ if (!scripts.length) fail('nenhum <script> inline');
 let code = scripts.join('\n').replace(/rate:Number\('%%FEE_RATE%%'\)/, "rate:Number('0.15')");
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lint-'));
 fs.writeFileSync(path.join(tmp, 'app.js'), code);
-fs.writeFileSync(path.join(tmp, 'eslint.config.mjs'), `export default [{files:['**/*.js'],languageOptions:{ecmaVersion:2022,sourceType:'script',globals:{document:'readonly',window:'readonly',location:'readonly',addEventListener:'readonly',navigator:'readonly',crypto:'readonly',supabase:'readonly',qrcode:'readonly',encodeURIComponent:'readonly',decodeURIComponent:'readonly',setTimeout:'readonly',console:'readonly'}},rules:{'no-undef':'error','no-unused-vars':['error',{args:'none',varsIgnorePattern:'^(hbusca|list|busca|ctrView|upd|calc|ctr|minhas|cuid|sp|ap|cad|ask|otp|acct|pixm|legal|mk|esc|home|render)$'}],'no-dupe-keys':'error','no-unreachable':'error','no-redeclare':'error','no-const-assign':'error','no-func-assign':'error','no-self-assign':'error','eqeqeq':['off']}}];`);
+fs.writeFileSync(path.join(tmp, 'eslint.config.mjs'), `export default [{files:['**/*.js'],languageOptions:{ecmaVersion:2022,sourceType:'script',globals:{document:'readonly',window:'readonly',location:'readonly',addEventListener:'readonly',navigator:'readonly',crypto:'readonly',supabase:'readonly',qrcode:'readonly',encodeURIComponent:'readonly',decodeURIComponent:'readonly',setTimeout:'readonly',console:'readonly'}},rules:{'no-undef':'error','no-unused-vars':['error',{args:'none',varsIgnorePattern:'^(hbusca|list|busca|ctrView|upd|calc|ctr|minhas|cuid|sp|ap|cad|ask|login|signup|forgot|senha|nsenha|acct|pixm|legal|mk|esc|home|render)$'}],'no-dupe-keys':'error','no-unreachable':'error','no-redeclare':'error','no-const-assign':'error','no-func-assign':'error','no-self-assign':'error','eqeqeq':['off']}}];`);
 try { execFileSync('eslint', ['-c', path.join(tmp, 'eslint.config.mjs'), path.join(tmp, 'app.js')], { stdio: 'pipe', cwd: tmp }); console.log('✓ eslint (JS inline) sem erros'); }
 catch (e) { fail('eslint:\n' + (e.stdout || e.stderr || e.message)); }
 // ids duplicados dentro de um mesmo template/tela são verificados em runtime (e2e); aqui: handlers inline apontam para funções existentes
@@ -17,7 +17,7 @@ const fns = new Set([...code.matchAll(/(?:function\s+|const\s+)([A-Za-z0-9_$]+)/
 for (const m of html.matchAll(/\bon(?:click|submit|change|input)="(?:const b=this;)?\s*([A-Za-z0-9_$]+)\(/g)) if (!fns.has(m[1]) && !['$'].includes(m[1])) fail('handler inline sem função: ' + m[1]);
 for (const m of code.matchAll(/\bon(?:click|submit|change|input)="\s*([A-Za-z0-9_$]+)\(/g)) if (!fns.has(m[1]) && m[1] !== '$') fail('handler (template) sem função: ' + m[1]);
 // rotas: todo href="#x" precisa existir no render()
-const routes = new Set(['inicio', 'buscar', 'cuidador', 'contrat', 'minhas', 'termos', 'privacidade', '']);
+const routes = new Set(['inicio', 'buscar', 'cuidador', 'contrat', 'minhas', 'senha', 'termos', 'privacidade', '']);
 for (const m of (html + code).matchAll(/href="#([a-z]*)/g)) if (!routes.has(m[1])) fail('rota desconhecida #' + m[1]);
 // placeholders que não podem existir
 for (const bad_ of [/COLE_AQUI/, /48999999999/, /5548999999999/, /lorem ipsum/i, /service_role/i]) if (bad_.test(html)) fail('placeholder/segredo no código: ' + bad_);
@@ -33,7 +33,7 @@ else {
   fs.writeFileSync(path.join(tmp, 'cb.js'), [...cb.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n'));
   try { execFileSync(process.execPath, ['--check', path.join(tmp, 'cb.js')], { stdio: 'pipe' }); console.log('✓ callback.html: sintaxe ok'); } catch (e) { fail('callback.html: erro de sintaxe\n' + e.stderr); }
   if (!/exchangeCodeForSession/.test(cb)) fail('callback.html não troca o code por sessão');
-  if (!/auth\/callback/.test(html)) fail('index.html não aponta emailRedirectTo para /auth/callback');
+  if (!/auth\/callback/.test(html)) fail('index.html não aponta redirectTo para /auth/callback');
 }
 fs.rmSync(tmp, { recursive: true, force: true });
 if (bad) { console.error(`\n${bad} problema(s)`); process.exit(1); }

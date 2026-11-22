@@ -31,7 +31,7 @@ const CFG={url:'%%SUPABASE_URL%%',key:'%%SUPABASE_ANON_KEY%%'};
  const q=new URLSearchParams(location.search),h=new URLSearchParams(location.hash.slice(1));
  const next=q.get('next')||'';
  /* só aceita rotas internas conhecidas: evita redirecionamento para outro site */
- const dest='/#'+(/^(inicio|buscar|cuidador|minhas|contrat\/[0-9a-fA-F-]{36})$/.test(next)?next:'minhas');
+ const dest='/#'+(/^(inicio|buscar|cuidador|minhas|senha|contrat\/[0-9a-fA-F-]{36})$/.test(next)?next:'minhas');
  const fail=(msg)=>{document.getElementById('t').textContent='Não foi possível entrar';
   const m=document.getElementById('m');m.textContent=msg;m.className='err';document.getElementById('b').hidden=false};
  if(q.get('error')||h.get('error')||q.get('error_description')||h.get('error_description'))return fail('O link expirou ou já foi usado. Volte ao site e peça um novo.');

@@ -155,12 +155,12 @@ function busca(){return `<h2>Encontrar cuidador</h2>
 <div><label for="fc">Cidade</label><input id="fc" value="${esc(flt.cid)}" placeholder="Ex: Criciúma" oninput="flt.cid=this.value;list()"></div></div>
 <div class="grid" id="list" style="margin-top:18px"></div>`}
 
-const LOGIN='Entre com seu e-mail para continuar. Sem senha: enviamos um link.';
+const LOGIN='Entre com seu e-mail e senha ou crie sua conta em segundos.';
 function ctrView(id){
  cur=rows.find(x=>x.id==id);
  if(!cur)return '<h2>Cuidador não encontrado</h2><a class="btn" href="#buscar">Voltar à busca</a>';
  const c=cur,head=`<h2>Contratar ${esc(short(c.nome))}</h2><p class="mut">${esc(c.cidade)} · ${c.esp.map(esc).join(', ')}</p>`;
- if(!sess)return head+`<div class="card"><p>Para contratar, entre com seu e-mail.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>`;
+ if(!sess)return head+`<div class="card"><p>Para contratar, entre ou crie sua conta.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>`;
  const opts=Object.keys(MOD).filter(m=>pr(c,m)).map(m=>`<option value="${m}">${MOD[m]} — ${brl(pr(c,m))}${m=='hora'?'/h':''}</option>`).join('');
  return head+`<form class="card" onsubmit="ctr(event)">
 <label for="tp">Tipo de serviço</label><select id="tp">${TIPOS.map(t=>`<option>${t}</option>`).join('')}</select>
@@ -179,7 +179,7 @@ function upd(){const m=$('#cm').value;$('#qw').style.display=m=='hora'?'block':'
 function calc(){const v=+$('#cv').value||0,t=Math.round(v*CFG.rate*100)/100;
  $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI (${PCT}%): <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
 async function ctr(ev){ev.preventDefault();
- if(!OK||!sess){$('#err').textContent='Entre com seu e-mail para contratar.';return}
+ if(!OK||!sess){$('#err').textContent='Entre ou crie sua conta para contratar.';return}
  const v=+$('#cv').value;if(!(v>0)){$('#err').textContent='Informe o valor negociado.';return}
  const m=$('#cm').value,t=Math.round(v*CFG.rate*100)/100;
  const r=await sb.from('contratacoes').insert({cuidador_id:cur.id,tipo:$('#tp').value,assistido:$('#an').value.trim(),parentesco:$('#pa').value,data:$('#dt').value,hora:$('#hr').value,modalidade:m,qtd:m=='hora'?Math.max(3,+$('#cq').value||3):1,tel_familia:$('#wt').value.replace(/\D/g,''),valor:v,taxa:t,cidade:$('#ci').value.trim(),endereco:$('#en').value.trim(),obs:$('#ob').value.trim()}).select('id').single();
@@ -187,7 +187,7 @@ async function ctr(ev){ev.preventDefault();
  await load();location.hash='#minhas';render();pixm(r.data.id)}
 
 function minhas(){
- if(!sess)return '<h2>Minhas contratações</h2><div class="card"><p>Entre com seu e-mail para ver suas contratações.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
+ if(!sess)return '<h2>Minhas contratações</h2><div class="card"><p>Entre ou crie sua conta para ver suas contratações.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
  return '<h2>Minhas contratações</h2>'+(mine.length?mine.map(k=>{
   const st=k.confirmada?`<p class="mut">Cuidador confirmado pela AMPARA AI. Pague o cuidador direto, depois que o serviço for realizado.</p>`:k.pago?`<p class="mut">Pix confirmado. Nossa equipe está fazendo a intermediação com o cuidador (até 2 horas) e avisará você pelo WhatsApp.</p>`:`<p class="mut">Aguardando o Pix. Depois do pagamento, a intermediação é feita em até 2 horas.</p><button class="btn alt" style="color:var(--ink)" onclick="pixm('${k.id}')">Ver dados do Pix</button>`;
   return `<article class="card"><div class="top"><h3>${esc(k.cuidadores?short(k.cuidadores.nome):'Cuidador')}</h3><span class="tag${k.pago?' ok':''}">${k.confirmada?'Confirmado':k.pago?'Em intermediação':'Aguardando Pix'}</span></div>
@@ -238,11 +238,46 @@ async function cad(ev){ev.preventDefault();const E=$('#err');E.textContent='';
  $('#app').innerHTML='<h2>Cadastro recebido</h2><div class="card"><p>Cadastro concluído! Seu perfil já aparece na busca. Nossa equipe pode conferir seus documentos e destacar seu perfil como verificado. Não há nenhuma cobrança para você.</p></div>'}
 
 function ask(msg){const m=$('#modal');m.hidden=false;
- m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 6px">Entrar</h3><p class="mut">${msg}</p><label for="le">Seu e-mail</label><input id="le" type="email" autocomplete="email">
-<div class="err" id="lerr"></div><button class="btn" onclick="otp()">Enviar link de acesso</button><button class="btn alt" onclick="$('#modal').hidden=true">Fechar</button></div>`}
-async function otp(){const email=$('#le').value.trim();if(!email)return;
- const r=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+'/auth/callback?next='+encodeURIComponent(location.hash.slice(1)||'minhas')}});
- $('#lerr').style.color='inherit';$('#lerr').textContent=r.error?'Erro ao enviar. Verifique o e-mail.':'Enviamos um link para o seu e-mail. Abra-o neste aparelho.'}
+ m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 6px">Entrar ou criar conta</h3><p class="mut">${msg}</p>
+<form onsubmit="login(event)"><label for="le">Seu e-mail</label><input id="le" type="email" autocomplete="email" required>
+<label for="lp">Senha (mínimo 8 caracteres)</label><input id="lp" type="password" autocomplete="current-password" minlength="8" required>
+<div class="err" id="lerr"></div>
+<button class="btn" type="submit">Entrar</button>
+<button class="btn alt" type="button" onclick="signup()">Criar conta</button></form>
+<p class="mut" style="text-align:center"><a href="#" onclick="forgot(event)" style="color:var(--td)">Esqueci minha senha</a></p>
+<p class="mut">Ao criar a conta você concorda com os <a href="#termos" onclick="$('#modal').hidden=true" style="color:var(--td)">Termos</a> e a <a href="#privacidade" onclick="$('#modal').hidden=true" style="color:var(--td)">Privacidade</a>.</p>
+<button class="btn alt" type="button" onclick="$('#modal').hidden=true">Fechar</button></div>`}
+const lmsg=(t,ok)=>{const e=$('#lerr');if(!e)return;e.style.color=ok?'var(--td)':'';e.textContent=t};
+const lerr=e=>/invalid login/i.test(e.message)?'E-mail ou senha incorretos.':/rate|too many|seconds/i.test(e.message)?'Muitas tentativas. Aguarde um minuto e tente de novo.':/weak|short|least/i.test(e.message)?'Senha muito fraca. Use pelo menos 8 caracteres.':'Não foi possível concluir. Tente novamente.';
+function cred(){
+ if(!OK){lmsg('Site ainda não configurado.');return null}
+ const email=$('#le').value.trim(),password=$('#lp').value;
+ if(!/^\S+@\S+\.\S+$/.test(email)){lmsg('Informe um e-mail válido.');return null}
+ if(password.length<8){lmsg('A senha precisa ter pelo menos 8 caracteres.');return null}
+ return{email,password}}
+async function login(ev){ev.preventDefault();const c=cred();if(!c)return;
+ const r=await sb.auth.signInWithPassword(c);
+ if(r.error){lmsg(/not confirmed/i.test(r.error.message)?'Confirme o link enviado ao seu e-mail para entrar.':lerr(r.error));return}
+ $('#modal').hidden=true}
+async function signup(){const c=cred();if(!c)return;
+ const r=await sb.auth.signUp(c);
+ if(r.error){lmsg(lerr(r.error));return}
+ if(!r.data.session){
+  const l=await sb.auth.signInWithPassword(c);
+  if(l.error){lmsg(/not confirmed/i.test(l.error.message)?'Conta criada. Confirme o link enviado ao seu e-mail para entrar.':'Este e-mail já tem conta. Toque em "Entrar" e use a sua senha.');return}}
+ $('#modal').hidden=true}
+async function forgot(ev){ev.preventDefault();
+ const email=$('#le').value.trim();
+ if(!OK||!/^\S+@\S+\.\S+$/.test(email)){lmsg('Digite seu e-mail acima e toque de novo.');return}
+ const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/auth/callback?next=senha'});
+ lmsg(r.error?'Não foi possível enviar. Tente novamente.':'Se o e-mail tiver conta, enviamos um link para criar uma nova senha.',!r.error)}
+function senha(){
+ if(!sess)return '<h2>Nova senha</h2><div class="card"><p>Abra o link de recuperação enviado ao seu e-mail.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
+ return `<h2>Criar nova senha</h2><form class="card" onsubmit="nsenha(event)"><label for="ns">Nova senha (mínimo 8 caracteres)</label><input id="ns" type="password" minlength="8" required autocomplete="new-password"><div class="err" id="err"></div><button class="btn" type="submit">Salvar senha</button></form>`}
+async function nsenha(ev){ev.preventDefault();
+ const r=await sb.auth.updateUser({password:$('#ns').value});
+ if(r.error){$('#err').textContent=lerr(r.error);return}
+ location.hash='#minhas'}
 async function acct(e){e.preventDefault();if(!OK)return;if(sess){await sb.auth.signOut();return}ask(LOGIN)}
 
 function tlv(i,v){return i+String(v.length).padStart(2,'0')+v}
@@ -285,7 +320,7 @@ function legal(t){
 <h3>Seus direitos (LGPD)</h3><p class="mut">Você pode pedir acesso, correção ou exclusão dos seus dados. ${ct}</p></div>`}
 function render(){const h=(location.hash||'#inicio').slice(1).split('/');
  const b=OK&&PIXOK?'':'<div class="note" style="margin-top:14px">Site em configuração: variáveis do Supabase, Pix e WhatsApp ainda não definidas no build (veja .env.example).</div>';
- $('#app').innerHTML=(h[0]=='buscar'?busca():h[0]=='cuidador'?cuid():h[0]=='contrat'?ctrView(h[1]):h[0]=='minhas'?minhas():h[0]=='termos'||h[0]=='privacidade'?legal(h[0]):home())+(h[0]=='termos'||h[0]=='privacidade'?'':b);
+ $('#app').innerHTML=(h[0]=='buscar'?busca():h[0]=='cuidador'?cuid():h[0]=='contrat'?ctrView(h[1]):h[0]=='minhas'?minhas():h[0]=='senha'?senha():h[0]=='termos'||h[0]=='privacidade'?legal(h[0]):home())+(h[0]=='termos'||h[0]=='privacidade'?'':b);
  if(h[0]=='buscar')list();
  if(h[0]=='contrat'&&sess&&cur&&$('#cm'))upd();
  window.scrollTo(0,0)}

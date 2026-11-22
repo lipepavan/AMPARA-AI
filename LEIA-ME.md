@@ -9,7 +9,8 @@ Arquivos: `index.html` (o site), `schema.sql` (banco), `scripts/` (build, lint, 
 2. SQL Editor > New query > cole o `schema.sql` > Run. (Banco que já existe: rode só o `migrations_acesso_imediato.sql`.)
 3. Settings > API: copie **Project URL** e a chave **anon public**.
 4. Authentication > URL Configuration: em *Site URL* coloque o endereço final do site e, em *Redirect URLs*, adicione `https://SEU-SITE/auth/callback` (sem isso o link do e-mail não volta para o site).
-5. Authentication > SMTP: configure um e-mail próprio (Resend, Brevo...). O envio padrão do Supabase tem limite baixo.
+5. Authentication > Sign In / Providers > Email: **Confirm email = DESLIGADO** (acesso imediato por e-mail e senha) e *Allow new users to sign up* ligado. Para o "Esqueci minha senha", configure em Authentication > SMTP um e-mail próprio (Resend, Brevo...): o envio padrão do Supabase só entrega para a sua equipe.
+6. Vercel > Settings > Deployment Protection: desligue *Vercel Authentication* e use sempre o domínio de produção (Project > Domains), não os endereços de deploy com código.
 
 ## 2. Configurar o site (variáveis de ambiente — não edite o index.html)
 Copie `.env.example` para `.env` (local) ou cadastre as mesmas variáveis na Vercel (Settings > Environment Variables): `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PIX_KEY` (celular com DDD, só números), `PIX_NAME`, `PIX_CITY`, `WHATSAPP` (55+DDD+número), `SITE_URL`, e opcionais `FEE_RATE` (0.15), `PAYMENT_LINK`, `CONTACT_EMAIL`. Em produção o build **falha** se algo obrigatório faltar.
