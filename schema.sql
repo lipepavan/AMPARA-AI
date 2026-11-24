@@ -7,6 +7,7 @@ create table cuidadores(
   nome text not null, cidade text not null, esp text[] not null,
   exp int not null default 0, bio text, coren text,
   p_hora numeric, p_8 numeric, p_12 numeric, p_24 numeric,
+  disponivel boolean not null default true,
   status text not null default 'ativo' check (status in ('ativo','pendente','verificado','reprovado')),
   certidao_em date default current_date,
   created_at timestamptz default now());
@@ -44,8 +45,15 @@ create policy "enviar contato" on cuidadores_contato for insert with check (true
 -- Contato, endereço e documentos do cuidador: ninguém lê pelo site, só você, no painel
 -- Cada família vê e cria só as suas contratações; "pago" e "confirmada" só são alterados por você, no painel
 create policy "minhas contratacoes" on contratacoes for select using (user_id=auth.uid());
-create policy "criar contratacao" on contratacoes for insert with check (user_id=auth.uid() and pago=false);
+-- "disponivel"=false: o site mostra o aviso e o banco recusa novas contratações desse cuidador
+create policy "criar contratacao" on contratacoes for insert with check (user_id=auth.uid() and pago=false and exists (select 1 from cuidadores c where c.id=contratacoes.cuidador_id and c.disponivel));
 
 -- Documentos dos cuidadores: qualquer um envia, ninguém lê pelo site (só você, no painel)
 insert into storage.buckets (id,name,public,file_size_limit,allowed_mime_types) values ('docs','docs',false,5242880,array['image/jpeg','image/png','image/webp','image/heic','application/pdf']) on conflict (id) do update set public=false,file_size_limit=5242880,allowed_mime_types=excluded.allowed_mime_types;
 create policy "enviar documentos" on storage.objects for insert to anon, authenticated with check (bucket_id='docs');
+
+-- Permissões das tabelas para o site (sem isso o Supabase responde "permission denied for table")
+grant usage on schema public to anon, authenticated;
+grant select, insert on public.cuidadores to anon, authenticated;
+grant insert on public.cuidadores_contato to anon, authenticated;
+grant select, insert on public.contratacoes to authenticated;

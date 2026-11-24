@@ -64,6 +64,9 @@ h2{font-size:22px;margin:30px 0 12px}
 .top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
 .tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;border:1px solid var(--line);color:var(--mut);white-space:nowrap}
 .tag.ok{background:var(--tint);color:var(--td);border-color:transparent}
+.tag.off{background:transparent;color:var(--coral);border-color:var(--coral)}
+.aviso{border:1px solid var(--coral);border-left-width:5px;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:15px;line-height:1.4}
+.btn.off,.btn.off:hover{background:var(--line);border-color:var(--line);color:var(--mut);box-shadow:none;filter:none;cursor:not-allowed;transform:none}
 .pills{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
 .pills span{font-size:12px;font-weight:600;background:var(--tint);color:var(--td);padding:3px 10px;border-radius:99px}
 label{display:block;font-size:14px;font-weight:600;margin:14px 0 5px}
@@ -123,8 +126,11 @@ let sess=null,rows=[],mine=[],flt={esp:'',cid:''},cur=null;
 
 async function load(){
  if(!OK)return;
- const r=await sb.from('cuidadores').select('id,nome,cidade,esp,exp,bio,p_hora,p_8,p_12,p_24,status').in('status',['ativo','verificado']).order('created_at',{ascending:false});
- rows=(r.data||[]).sort((a,b)=>(b.status=='verificado')-(a.status=='verificado'));mine=[];
+ const COLS='id,nome,cidade,esp,exp,bio,p_hora,p_8,p_12,p_24,status',q=c=>sb.from('cuidadores').select(c).in('status',['ativo','verificado']).order('created_at',{ascending:false});
+ let r=await q(COLS+',disponivel');
+ if(r.error)r=await q(COLS); // banco ainda sem a coluna "disponivel": todos aparecem como disponíveis
+ const off=c=>c.disponivel===false?1:0;
+ rows=(r.data||[]).sort((a,b)=>off(a)-off(b)||(b.status=='verificado')-(a.status=='verificado'));mine=[];
  if(sess){
   const k=await sb.from('contratacoes').select('*,cuidadores(nome)').order('created_at',{ascending:false});mine=k.data||[];
  }
@@ -157,10 +163,12 @@ function home(){return `
 
 function hbusca(ev){ev.preventDefault();flt.esp=$('#hs').value;flt.cid=$('#hc').value.trim();location.hash='#buscar'}
 function pline(c){return ['hora','8','12','24'].filter(m=>pr(c,m)).map(m=>MOD[m].replace(' (mín. 3h)','')+' '+brl(pr(c,m))+(m=='hora'?'/h':'')).join(' · ')}
-function card(c){return `<article class="card"><div class="top"><h3>${esc(short(c.nome))}</h3>${c.status=='verificado'?'<span class="tag ok">Verificado</span>':''}</div>
+const indisp=c=>c.disponivel===false;
+const AVISO='<div class="aviso" role="status"><b>Indisponível no momento.</b> Este cuidador não está recebendo novas contratações agora. Veja outros cuidadores disponíveis.</div>';
+function card(c){return `<article class="card"><div class="top"><h3>${esc(short(c.nome))}</h3>${indisp(c)?'<span class="tag off">Indisponível</span>':c.status=='verificado'?'<span class="tag ok">Verificado</span>':''}</div>
 <p class="mut">${esc(c.cidade)} · ${c.exp} ${c.exp==1?'ano':'anos'} de experiência</p>
 <div class="pills">${c.esp.map(e=>`<span>${esc(e)}</span>`).join('')}</div><p>${esc(c.bio)}</p>
-<p class="mut"><b>${esc(pline(c))}</b></p><a class="btn" href="#contrat/${c.id}">Contratar</a></article>`}
+<p class="mut"><b>${esc(pline(c))}</b></p>${indisp(c)?AVISO+'<button class="btn off" type="button" disabled>Indisponível no momento</button>':`<a class="btn" href="#contrat/${c.id}">Contratar</a>`}</article>`}
 function list(){
  const r=rows.filter(c=>(!flt.esp||c.esp.includes(flt.esp))&&(!flt.cid||c.cidade.toLowerCase().includes(flt.cid.toLowerCase())));
  $('#list').innerHTML=r.length?r.map(card).join(''):'<p class="mut">Nenhum cuidador encontrado com esses filtros.</p>'}
@@ -174,6 +182,7 @@ function ctrView(id){
  cur=rows.find(x=>x.id==id);
  if(!cur)return '<h2>Cuidador não encontrado</h2><a class="btn" href="#buscar">Voltar à busca</a>';
  const c=cur,head=`<h2>Contratar ${esc(short(c.nome))}</h2><p class="mut">${esc(c.cidade)} · ${c.esp.map(esc).join(', ')}</p>`;
+ if(indisp(c))return head+`<div class="card">${AVISO}<a class="btn" href="#buscar">Ver outros cuidadores</a></div>`;
  if(!sess)return head+`<div class="card"><p>Para contratar, entre ou crie sua conta.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>`;
  const opts=Object.keys(MOD).filter(m=>pr(c,m)).map(m=>`<option value="${m}">${MOD[m]} — ${brl(pr(c,m))}${m=='hora'?'/h':''}</option>`).join('');
  return head+`<form class="card" onsubmit="ctr(event)">
@@ -194,6 +203,7 @@ function calc(){const v=val($('#cv')),t=Math.round(v*CFG.rate*100)/100;
  $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI: <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
 async function ctr(ev){ev.preventDefault();
  if(!OK||!sess){$('#err').textContent='Entre ou crie sua conta para contratar.';return}
+ if(indisp(cur)){$('#err').textContent='Este cuidador está indisponível no momento.';return}
  const v=val($('#cv'));if(!(v>0)){$('#err').textContent='Informe o valor negociado.';return}
  const m=$('#cm').value,t=Math.round(v*CFG.rate*100)/100;
  const r=await sb.from('contratacoes').insert({cuidador_id:cur.id,tipo:$('#tp').value,assistido:$('#an').value.trim(),parentesco:$('#pa').value,data:$('#dt').value,hora:$('#hr').value,modalidade:m,qtd:m=='hora'?Math.max(3,+$('#cq').value||3):1,tel_familia:$('#wt').value.replace(/\D/g,''),valor:v,taxa:t,cidade:$('#ci').value.trim(),endereco:$('#en').value.trim(),obs:$('#ob').value.trim()}).select('id').single();
@@ -336,7 +346,7 @@ function pixm(id){
  const code=brcode(k.taxa);let qr='';
  try{const q=qrcode(0,'M');q.addData(code);q.make();qr=q.createImgTag(4,8)}catch{}
  const nm=k.cuidadores?short(k.cuidadores.nome):'';
- const msg=encodeURIComponent('Olá! Paguei o Pix de '+brl(k.taxa)+' da intermediação com '+nm+' ('+k.tipo+', '+k.data+'). E-mail da conta: '+(sess?sess.user.email:''));
+ const msg=encodeURIComponent('Olá! Paguei o Pix de '+brl(k.taxa)+' da intermediação com '+nm+' ('+k.tipo+', '+k.data+'). Pedido '+String(k.id).slice(0,8)+'. E-mail da conta: '+(sess?sess.user.email:''));
  m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 4px">Pagar intermediação via Pix</h3><div class="price">${brl(k.taxa)}</div>
 <p class="mut">Taxa de intermediação sobre ${brl(k.valor)}, valor negociado com ${esc(nm)}.</p>
 <div style="text-align:center">${qr}</div>

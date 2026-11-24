@@ -5,7 +5,7 @@
   {id:uid(),nome:'Maria da Silva Souza',cidade:'Criciúma',esp:['Enfermeiro(a)','Cuidados paliativos'],exp:8,bio:'Enfermeira com experiência em cuidados paliativos e pós-operatório em casa.',p_hora:55,p_8:300,p_12:420,p_24:650,status:'verificado',created_at:'2026-11-01T10:00:00Z'},
   {id:uid(),nome:'João Pereira Lima',cidade:'Criciúma',esp:['Técnico em enfermagem','Acompanhante hospitalar'],exp:5,bio:'Técnico em enfermagem. Acompanhamento hospitalar e curativos.',p_hora:40,p_8:220,p_12:280,p_24:400,status:'verificado',created_at:'2026-11-02T10:00:00Z'},
   {id:uid(),nome:'Ana Paula Rocha',cidade:'Içara',esp:['Cuidador com curso'],exp:3,bio:'Curso de cuidador de idosos. Higiene, alimentação e companhia.',p_hora:30,p_8:180,p_12:250,p_24:380,status:'ativo',created_at:'2026-11-05T10:00:00Z'},
-  {id:uid(),nome:'Carlos Eduardo Nunes',cidade:'Forquilhinha',esp:['Cuidador com experiência','Acompanhante hospitalar'],exp:10,bio:'Dez anos cuidando de idosos acamados e com Alzheimer.',p_hora:35,p_8:200,p_12:270,p_24:390,status:'ativo',created_at:'2026-11-08T10:00:00Z'}]});
+  {id:uid(),nome:'Carlos Eduardo Nunes',disponivel:false,cidade:'Forquilhinha',esp:['Cuidador com experiência','Acompanhante hospitalar'],exp:10,bio:'Dez anos cuidando de idosos acamados e com Alzheimer.',p_hora:35,p_8:200,p_12:270,p_24:390,status:'ativo',created_at:'2026-11-08T10:00:00Z'}]});
  let db;try{db=JSON.parse(localStorage.getItem(K))}catch{}
  if(!db)db=seed();
  const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch{}};

@@ -10,6 +10,8 @@ Site brasileiro (pt-BR) de **intermediação entre famílias e cuidadores** de i
 - **O contato (telefone/e-mail/endereço) do cuidador NUNCA aparece no site.** Toda comunicação passa pela AMPARA AI.
 - Cadastro do cuidador: dados pessoais, especialidades (enfermeiro(a), técnico em enfermagem, cuidador com curso, cuidador com experiência, acompanhante hospitalar, cuidados paliativos), COREN (se enfermeiro/técnico), endereço completo, **RG e comprovante de endereço obrigatórios; certidão de antecedentes OPCIONAL** (validade de 30 dias).
 - **Acesso imediato (decidido pelo dono em 22/11/2026):** cuidador aparece na busca assim que se cadastra (`status='ativo'`). `verificado` é só um selo opcional que o dono concede após conferir documentos; `reprovado` esconde o perfil. Nunca exibir o selo "Verificado" para perfil `ativo`. **Não criar perfis de demonstração** no site real.
+- **Cuidador indisponível:** coluna `cuidadores.disponivel` (padrão true). Com `false` o site mostra a tag e o aviso "Indisponível no momento", troca o botão por um desativado, e o banco recusa nova contratação (policy `criar contratacao`). O dono troca no Table Editor. `migrations_indisponivel.sql` aplica isso (idempotente); sem a coluna o site continua funcionando, todos aparecem como disponíveis.
+- **Aviso de novo pedido por e-mail:** `aviso_email.sql` cria um trigger em `contratacoes` que manda e-mail ao dono via Resend (pg_net). Chave e e-mail ficam no Vault do Supabase (`resend_api_key`, `aviso_email_destino`), nunca no código. Falha no aviso nunca bloqueia o pedido. Contato da família não vai no e-mail.
 - Pix: chave tipo telefone do dono, gerada em BRCode estático (já implementado em `index.html`, funções `brcode`/`pixm`).
 
 ## Stack e estrutura

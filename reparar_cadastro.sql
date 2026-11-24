@@ -26,3 +26,9 @@ values ('docs','docs',false,5242880,array['image/jpeg','image/png','image/webp',
 on conflict (id) do update set public=false,file_size_limit=5242880,allowed_mime_types=excluded.allowed_mime_types;
 drop policy if exists "enviar documentos" on storage.objects;
 create policy "enviar documentos" on storage.objects for insert to anon, authenticated with check (bucket_id='docs');
+
+-- Permissões das tabelas para o site (sem isso o Supabase responde "permission denied for table")
+grant usage on schema public to anon, authenticated;
+grant select, insert on public.cuidadores to anon, authenticated;
+grant insert on public.cuidadores_contato to anon, authenticated;
+grant select, insert on public.contratacoes to authenticated;
