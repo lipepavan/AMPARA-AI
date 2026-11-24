@@ -8,6 +8,7 @@
   {id:uid(),nome:'Carlos Eduardo Nunes',disponivel:false,cidade:'Forquilhinha',esp:['Cuidador com experiência','Acompanhante hospitalar'],exp:10,bio:'Dez anos cuidando de idosos acamados e com Alzheimer.',p_hora:35,p_8:200,p_12:270,p_24:390,status:'ativo',created_at:'2026-11-08T10:00:00Z'}]});
  let db;try{db=JSON.parse(localStorage.getItem(K))}catch{}
  if(!db)db=seed();
+ if(!db.contratacoes.some(r=>r.confirmada&&r.user_id=='agenda@demo')){const a=db.cuidadores.find(c=>c.nome.startsWith('Ana'));if(a){const d=new Date(Date.now()+864e5),z=n=>String(n).padStart(2,'0');db.contratacoes.push({id:uid(),user_id:'agenda@demo',cuidador_id:a.id,tipo:'Acompanhamento',assistido:'-',data:d.getFullYear()+'-'+z(d.getMonth()+1)+'-'+z(d.getDate()),hora:'08:00',modalidade:'8',qtd:1,valor:200,taxa:30,pago:true,confirmada:true,created_at:now()})}}
  const save=()=>{try{localStorage.setItem(K,JSON.stringify(db))}catch{}};
  let sess=null;try{sess=JSON.parse(localStorage.getItem(K+'_s'))}catch{}
  const setS=s=>{sess=s;try{s?localStorage.setItem(K+'_s',JSON.stringify(s)):localStorage.removeItem(K+'_s')}catch{}};
@@ -30,8 +31,11 @@
      rows.sort((a,b)=>String(b.created_at).localeCompare(String(a.created_at)));d={data:rows,error:null}}
     return Promise.resolve(d).then(ok,no)}};
   return q};
+ const rpc=async(n,a)=>{if(n!='agenda_cuidador')return{data:null,error:{message:'rpc'}};
+  const f=x=>new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,19);
+  return{error:null,data:db.contratacoes.filter(r=>r.confirmada&&r.cuidador_id==a.cid).map(r=>{const s=new Date(r.data+'T'+r.hora),h=r.modalidade=='hora'?r.qtd:+r.modalidade;return{inicio:f(s),fim:f(new Date(s.getTime()+h*36e5))}})}};
  const ok=()=>({error:null,data:{session:sess}});
- window.supabase={createClient:()=>({from,
+ window.supabase={createClient:()=>({from,rpc,
   auth:{
    getSession:async()=>({data:{session:sess}}),
    onAuthStateChange:f=>{cb=f;return{data:{subscription:{unsubscribe(){}}}}},

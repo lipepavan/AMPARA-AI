@@ -184,11 +184,13 @@ function ctrView(id){
  const c=cur,head=`<h2>Contratar ${esc(short(c.nome))}</h2><p class="mut">${esc(c.cidade)} · ${c.esp.map(esc).join(', ')}</p>`;
  if(indisp(c))return head+`<div class="card">${AVISO}<a class="btn" href="#buscar">Ver outros cuidadores</a></div>`;
  if(!sess)return head+`<div class="card"><p>Para contratar, entre ou crie sua conta.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>`;
+ setTimeout(()=>agenda(c.id),0);
  const opts=Object.keys(MOD).filter(m=>pr(c,m)).map(m=>`<option value="${m}">${MOD[m]} — ${brl(pr(c,m))}${m=='hora'?'/h':''}</option>`).join('');
  return head+`<form class="card" onsubmit="ctr(event)">
 <label for="tp">Tipo de serviço</label><select id="tp">${TIPOS.map(t=>`<option>${t}</option>`).join('')}</select>
 <div class="row"><div><label for="an">Nome do assistido</label><input id="an" required></div><div><label for="pa">Parentesco / relação</label><select id="pa">${PAR.map(p=>`<option>${p}</option>`).join('')}</select></div></div>
-<div class="row"><div><label for="dt">Data</label><input id="dt" type="date" required min="${new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}"></div><div><label for="hr">Horário de início</label><input id="hr" type="time" required></div></div>
+<div id="ag"></div>
+<div class="row"><div><label for="dt">Data</label><input id="dt" type="date" required onchange="chkAg()" min="${new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10)}"></div><div><label for="hr">Horário de início</label><input id="hr" type="time" required onchange="chkAg()"></div></div>
 <label for="cm">Modalidade</label><select id="cm" onchange="upd()">${opts}</select>
 <div id="qw"><label for="cq">Quantidade de horas</label><input id="cq" type="number" min="3" value="3" oninput="upd()"></div>
 <div class="row"><div><label for="ci">Cidade</label><input id="ci" required value="${esc(c.cidade)}"></div><div><label for="en">Endereço do atendimento</label><input id="en" required></div></div>
@@ -198,16 +200,32 @@ function ctrView(id){
 <div class="note" id="fx"></div><div class="err" id="err"></div>
 <button class="btn" type="submit">Pagar intermediação via Pix</button></form>`}
 function upd(){const m=$('#cm').value;$('#qw').style.display=m=='hora'?'block':'none';
- const q=m=='hora'?Math.max(3,+$('#cq').value||3):1;$('#cv').value=brl(pr(cur,m)*q);calc()}
+ const q=m=='hora'?Math.max(3,+$('#cq').value||3):1;$('#cv').value=brl(pr(cur,m)*q);calc();chkAg()}
+let ocup=[];
+const pad2=n=>String(n).padStart(2,'0'),hm=d=>pad2(d.getHours())+':'+pad2(d.getMinutes()),dm=d=>pad2(d.getDate())+'/'+pad2(d.getMonth()+1);
+const fmtI=(a,b)=>dm(a)+' '+hm(a)+' às '+(dm(a)==dm(b)?'':dm(b)+' ')+hm(b);
+async function agenda(id){
+ ocup=[];if(!OK)return;
+ try{const r=await sb.rpc('agenda_cuidador',{cid:id});if(!r.error)ocup=(r.data||[]).map(x=>[new Date(x.inicio),new Date(x.fim)])}catch{}
+ const el=$('#ag');
+ if(el&&cur&&cur.id==id)el.innerHTML=ocup.length?`<div class="aviso" role="status"><b>Agenda deste cuidador:</b> já tem serviço confirmado em ${ocup.map(b=>esc(fmtI(b[0],b[1]))).join('; ')}. Escolha outro dia ou horário.</div>`:''}
+function conflito(){
+ const dt=$('#dt'),hr=$('#hr');if(!dt||!hr||!dt.value||!hr.value||!ocup.length)return null;
+ const m=$('#cm').value,q=m=='hora'?Math.max(3,+$('#cq').value||3):({'8':8,'12':12,'24':24})[m]||1;
+ const a=new Date(dt.value+'T'+hr.value),b=new Date(a.getTime()+q*36e5);
+ return ocup.find(x=>a<x[1]&&x[0]<b)||null}
+const MSGOC=c=>'Este cuidador já tem um serviço confirmado nesse horário ('+fmtI(c[0],c[1])+'). Escolha outro dia ou horário.';
+function chkAg(){const e=$('#err'),c=conflito();if(e&&(c||e.dataset.ag)){e.textContent=c?MSGOC(c):'';e.dataset.ag=c?'1':''}}
 function calc(){const v=val($('#cv')),t=Math.round(v*CFG.rate*100)/100;
  $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI: <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
 async function ctr(ev){ev.preventDefault();
  if(!OK||!sess){$('#err').textContent='Entre ou crie sua conta para contratar.';return}
  if(indisp(cur)){$('#err').textContent='Este cuidador está indisponível no momento.';return}
+ const cf=conflito();if(cf){$('#err').textContent=MSGOC(cf);return}
  const v=val($('#cv'));if(!(v>0)){$('#err').textContent='Informe o valor negociado.';return}
  const m=$('#cm').value,t=Math.round(v*CFG.rate*100)/100;
  const r=await sb.from('contratacoes').insert({cuidador_id:cur.id,tipo:$('#tp').value,assistido:$('#an').value.trim(),parentesco:$('#pa').value,data:$('#dt').value,hora:$('#hr').value,modalidade:m,qtd:m=='hora'?Math.max(3,+$('#cq').value||3):1,tel_familia:$('#wt').value.replace(/\D/g,''),valor:v,taxa:t,cidade:$('#ci').value.trim(),endereco:$('#en').value.trim(),obs:$('#ob').value.trim()}).select('id').single();
- if(r.error){$('#err').textContent='Não foi possível registrar. Tente novamente.';return}
+ if(r.error){$('#err').textContent=/row-level security|violates/i.test(r.error.message||'')?'Não foi possível registrar: o cuidador pode estar indisponível nesse horário. Escolha outro dia ou horário.':'Não foi possível registrar. Tente novamente.';return}
  await load();location.hash='#minhas';render();pixm(r.data.id)}
 
 function minhas(){
@@ -320,11 +338,22 @@ async function signup(){const c=cred();if(!c)return;
    const l=await sb.auth.signInWithPassword(c);
    if(l.error){lmsg(/not confirmed/i.test(l.error.message)?'Conta criada. Abra o link enviado ao seu e-mail para confirmar e entrar. (Para entrar direto, desligue "Confirm email" no Supabase.)':EXISTE);return}}
   entrou('Conta criada! Você já está conectado como '+c.email)})}
+let fgEspera=0,fgMsg='';
+const FGLIM='Muitos pedidos de e-mail em pouco tempo. Aguarde cerca de 1 hora e tente de novo.',FGJA='Já enviamos o link. Confira também a caixa de spam e aguarde 1 minuto para pedir de novo.';
 async function forgot(ev){ev.preventDefault();
- const email=$('#le').value.trim();
+ const email=$('#le').value.trim(),a=ev.currentTarget||ev.target;
  if(!OK||!/^\S+@\S+\.\S+$/.test(email)){lmsg('Digite seu e-mail acima e toque de novo.');return}
- const r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/auth/callback?next=senha'});
- lmsg(r.error?'Não foi possível enviar. Tente novamente.':'Se o e-mail tiver conta, enviamos um link para criar uma nova senha.',!r.error)}
+ if(Date.now()<fgEspera){lmsg(fgMsg);return}
+ fgEspera=Date.now()+6e4;fgMsg=FGJA;
+ const txt=a.textContent;a.textContent='Enviando…';
+ let r;try{r=await sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+'/auth/callback?next=senha'})}catch{r={error:{message:'network'}}}
+ a.textContent=txt;
+ if(r.error){const m=r.error.message||'';console.warn('resetPasswordForEmail:',m);
+  const lim=/rate|too many|seconds/i.test(m);if(lim){fgEspera=Date.now()+36e5;fgMsg=FGLIM}else fgEspera=0;
+  lmsg(lim?FGLIM
+   :/not authorized|not allowed/i.test(m)?'Não conseguimos enviar o e-mail de recuperação agora. Fale com a AMPARA AI pelo WhatsApp para trocar a senha.'
+   :'Não foi possível enviar. Confira a internet e tente de novo.');return}
+ lmsg('Se o e-mail tiver conta, enviamos um link para criar uma nova senha. Confira também a caixa de spam.',true)}
 function senha(){
  if(!sess)return '<h2>Nova senha</h2><div class="card"><p>Abra o link de recuperação enviado ao seu e-mail.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
  return `<h2>Criar nova senha</h2><form class="card" onsubmit="nsenha(event)"><label for="ns">Nova senha (mínimo 8 caracteres)</label><div class="pw"><input id="ns" type="password" minlength="8" required autocomplete="new-password"><button type="button" class="eye" onclick="tpw(this)" aria-label="Mostrar ou ocultar a senha" aria-pressed="false">Mostrar</button></div><div class="err" id="err"></div><button class="btn" type="submit">Salvar senha</button></form>`}
