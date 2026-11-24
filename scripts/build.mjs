@@ -1,7 +1,9 @@
 // Gera dist/ a partir de index.html + public/, injetando as variáveis de ambiente (.env ou ambiente da Vercel).
 import fs from 'node:fs';
 import path from 'node:path';
-const root = path.resolve(import.meta.dirname, '..');
+import { fileURLToPath } from 'node:url';
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(HERE, '..');
 const env = { ...readDotEnv(path.join(root, '.env')), ...process.env };
 const prod = env.VERCEL_ENV === 'production' || env.STRICT === '1';
 

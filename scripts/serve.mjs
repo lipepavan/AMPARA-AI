@@ -1,6 +1,8 @@
 // Servidor estático simples para pré-visualizar dist/ (porta 4173 ou PORT).
 import http from 'node:http'; import fs from 'node:fs'; import path from 'node:path';
-const dir = path.resolve(import.meta.dirname, '..', 'dist');
+import { fileURLToPath } from 'node:url';
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const dir = path.resolve(HERE, '..', 'dist');
 const port = Number(process.env.PORT) || 4173;
 const types = { '.html': 'text/html; charset=utf-8', '.png': 'image/png', '.txt': 'text/plain', '.xml': 'application/xml', '.svg': 'image/svg+xml' };
 http.createServer((q, r) => {

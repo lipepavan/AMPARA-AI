@@ -1,7 +1,9 @@
 // Lint: extrai o JS inline do index.html, roda ESLint (regras de erro) e confere links/ids/placeholders.
 import fs from 'node:fs'; import path from 'node:path'; import { execFileSync } from 'node:child_process';
 import os from 'node:os';
-const root = path.resolve(import.meta.dirname, '..');
+import { fileURLToPath } from 'node:url';
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const root = path.resolve(HERE, '..');
 const html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 let bad = 0; const fail = (m) => { console.error('✗ ' + m); bad++; };
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
@@ -9,9 +11,22 @@ if (!scripts.length) fail('nenhum <script> inline');
 let code = scripts.join('\n').replace(/rate:Number\('%%FEE_RATE%%'\)/, "rate:Number('0.15')");
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'lint-'));
 fs.writeFileSync(path.join(tmp, 'app.js'), code);
-fs.writeFileSync(path.join(tmp, 'eslint.config.mjs'), `export default [{files:['**/*.js'],languageOptions:{ecmaVersion:2022,sourceType:'script',globals:{document:'readonly',window:'readonly',location:'readonly',addEventListener:'readonly',navigator:'readonly',crypto:'readonly',supabase:'readonly',qrcode:'readonly',encodeURIComponent:'readonly',decodeURIComponent:'readonly',setTimeout:'readonly',clearTimeout:'readonly',console:'readonly'}},rules:{'no-undef':'error','no-unused-vars':['error',{args:'none',varsIgnorePattern:'^(hbusca|list|busca|ctrView|upd|calc|ctr|minhas|cuid|sp|ap|cad|ask|login|signup|tpw|forgot|senha|nsenha|acct|pixm|legal|mk|esc|home|render)$'}],'no-dupe-keys':'error','no-unreachable':'error','no-redeclare':'error','no-const-assign':'error','no-func-assign':'error','no-self-assign':'error','eqeqeq':['off']}}];`);
-try { execFileSync('eslint', ['-c', path.join(tmp, 'eslint.config.mjs'), path.join(tmp, 'app.js')], { stdio: 'pipe', cwd: tmp }); console.log('✓ eslint (JS inline) sem erros'); }
-catch (e) { fail('eslint:\n' + (e.stdout || e.stderr || e.message)); }
+fs.writeFileSync(path.join(tmp, 'eslint.config.mjs'), `export default [{files:['**/*.js'],languageOptions:{ecmaVersion:2022,sourceType:'script',globals:{document:'readonly',window:'readonly',location:'readonly',addEventListener:'readonly',navigator:'readonly',crypto:'readonly',supabase:'readonly',qrcode:'readonly',encodeURIComponent:'readonly',decodeURIComponent:'readonly',setTimeout:'readonly',clearTimeout:'readonly',console:'readonly'}},rules:{'no-undef':'error','no-unused-vars':['error',{args:'none',varsIgnorePattern:'^(hbusca|list|busca|ctrView|upd|calc|ctr|minhas|cuid|sp|ap|cad|ask|moeda|login|signup|tpw|forgot|senha|nsenha|acct|pixm|legal|mk|esc|home|render)$'}],'no-dupe-keys':'error','no-unreachable':'error','no-redeclare':'error','no-const-assign':'error','no-func-assign':'error','no-self-assign':'error','eqeqeq':['off']}}];`);
+const cfg = path.join(tmp, 'eslint.config.mjs'), target = path.join(tmp, 'app.js');
+let ran = false;
+for (const cmd of [['eslint'], ['npx', '--no-install', 'eslint']]) {
+  try {
+    execFileSync(cmd[0], [...cmd.slice(1), '-c', cfg, target], { stdio: 'pipe', cwd: tmp, shell: true });
+    console.log('✓ eslint (JS inline) sem erros'); ran = true; break;
+  } catch (e) {
+    const out = String(e.stdout || '') + String(e.stderr || '');
+    if (/app\.js/.test(out) && /\d+:\d+\s+error/.test(out)) { fail('eslint:\n' + out); ran = true; break; }
+  }
+}
+if (!ran) {
+  try { execFileSync(process.execPath, ['--check', target], { stdio: 'pipe' }); console.log('✓ sintaxe do JS ok (ESLint não instalado: verificação reduzida; opcional: npm i -g eslint)'); }
+  catch (e2) { fail('erro de sintaxe no JS inline:\n' + (e2.stderr || e2.message)); }
+}
 // ids duplicados dentro de um mesmo template/tela são verificados em runtime (e2e); aqui: handlers inline apontam para funções existentes
 const fns = new Set([...code.matchAll(/(?:function\s+|const\s+)([A-Za-z0-9_$]+)/g)].map((m) => m[1]));
 for (const m of html.matchAll(/\bon(?:click|submit|change|input)="(?:const b=this;)?\s*([A-Za-z0-9_$]+)\(/g)) if (!fns.has(m[1]) && !['$'].includes(m[1])) fail('handler inline sem função: ' + m[1]);

@@ -25,6 +25,14 @@ Site brasileiro (pt-BR) de **intermediação entre famílias e cuidadores** de i
 - Precisa de `https://<site>/auth/callback` em Supabase > Authentication > Redirect URLs, e do domínio de produção estável (não URL de deploy) em Site URL.
 - Vercel: **Deployment Protection / Vercel Authentication desligada** para o site público, senão visitantes caem no login da Vercel.
 
+## Visual
+- Paleta azul (combina com `public/hero.jpg`, a foto do topo da home, e `public/og.jpg` para compartilhamento). Variáveis CSS em `:root` (claro/escuro). Botões grandes (`.btn`, altura mínima 52px); `.btn.alt` = contorno.
+- Home: hero em `#heroslot` (fora do `<main>`). ≥1200px a caixa de busca fica sobre a imagem (proporção 16:9, sem cortar a faixa inferior); abaixo disso a imagem fica em cima e o cartão embaixo.
+
+## Formulários
+- Valores em R$ usam máscara (`moeda`/`val`: digita-se só números, aparece `R$ 1.234,56`). Percentual da taxa não aparece na tela (só em Termos); o valor da taxa em R$ aparece antes do Pix.
+- Cadastro do cuidador em etapas (perfil, contato, documentos) com retomada e mensagem de erro com a etapa e o motivo. `reparar_cadastro.sql` reaplica as regras do banco (idempotente).
+
 ## Variáveis de ambiente (veja `.env.example`)
 Obrigatórias: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `PIX_KEY`, `WHATSAPP`, `SITE_URL`. Com padrão: `PIX_NAME`, `PIX_CITY`, `FEE_RATE`=0.15. Opcionais: `PAYMENT_LINK`, `CONTACT_EMAIL`. Build de produção (`VERCEL_ENV=production` ou `STRICT=1`) falha se faltar alguma obrigatória.
 

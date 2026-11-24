@@ -1,0 +1,31 @@
+<style>
+.dm-fab{position:fixed;left:12px;bottom:12px;z-index:25;display:flex;gap:8px;flex-wrap:wrap}
+.dm-fab button{min-height:44px;padding:8px 16px;font-size:14px;border-radius:99px;box-shadow:0 4px 16px rgba(0,0,0,.3)}
+.dm-tag{background:#c4521f;color:#fff;text-align:center;font-size:13px;font-weight:700;padding:6px 10px;letter-spacing:.3px}
+.dm-row{border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0;font-size:14px}
+.dm-row b{display:block}.dm-row .btn{min-height:44px;font-size:14px;padding:8px 14px;margin:8px 8px 0 0;width:auto!important}
+.dm-warn{background:#fdeadf;color:#9a3d12;border-radius:10px;padding:10px 12px;font-weight:700;font-size:14px;margin:0 0 10px}
+#toast{bottom:76px!important}
+.dm-sheet{max-width:560px}
+.dm-sheet ol{padding-left:20px;margin:8px 0}.dm-sheet li{margin:8px 0}
+</style>
+<div class="dm-fab"><button class="btn" onclick="dmGuide()">Como testar</button><button class="btn alt" style="background:var(--card)" onclick="dmOwner()">Simular dono</button></div>
+<div id="dm-ov" class="ov" hidden onclick="if(event.target===this)this.hidden=true"></div>
+<script>
+function dmClose(){document.getElementById('dm-ov').hidden=true}
+function dmOpen(h){const o=document.getElementById('dm-ov');o.innerHTML='<div class="sheet dm-sheet">'+h+'<button class="btn alt" onclick="dmClose()">Fechar</button></div>';o.hidden=false}
+function dmGuide(){dmOpen(`<h3 style="margin:0 0 6px">Como testar a demonstração</h3><p class="mut">Dados fictícios. Nada é enviado nem pago de verdade.</p><ol>
+<li><b>Buscar:</b> escolha o tipo e a cidade na primeira tela e toque em <b>Encontrar cuidador</b>.</li>
+<li><b>Contratar:</b> toque em <b>Contratar</b>, depois em <b>Entrar</b> e em <b>Criar conta</b> (qualquer e-mail e senha com 8 ou mais caracteres). Você entra na hora, sem e-mail de confirmação.</li>
+<li><b>Pagar:</b> preencha o serviço (o valor já vem da tabela do cuidador). A taxa aparece em reais. Toque em <b>Pagar intermediação via Pix</b> para ver o QR Code e o copia e cola.</li>
+<li><b>Acompanhar:</b> em <b>Contratações</b> o status é "Aguardando Pix". Abra <b>Simular dono</b>, marque <b>Pix recebido</b> e depois <b>Cuidador aceitou</b>: o status muda para "Em intermediação" e "Confirmado".</li>
+<li><b>Sou cuidador:</b> faça o cadastro. O perfil aparece na busca na hora. Em <b>Simular dono</b> você pode dar o selo <b>Verificado</b>.</li></ol>`)}
+function dmOwner(){const d=__demo.db,cu=n=>(d.cuidadores.find(c=>c.id==n)||{}).nome||'Cuidador';
+ const k=d.contratacoes.map(c=>`<div class="dm-row"><b>${esc(cu(c.cuidador_id))} · ${esc(c.tipo)} · ${esc(c.data)}</b>Família: ${esc(c.user_id)} · WhatsApp ${esc(c.tel_familia)}<br>Valor ${brl(c.valor)} · Taxa ${brl(c.taxa)} · <b style="display:inline">${c.confirmada?'Confirmado':c.pago?'Em intermediação':'Aguardando Pix'}</b><br>
+ ${c.pago?'':`<button class="btn" onclick="dmSet('${c.id}','pago')">Pix recebido</button>`}${c.confirmada?'':`<button class="btn alt" onclick="dmSet('${c.id}','confirmada')">Cuidador aceitou</button>`}</div>`).join('')||'<p class="mut">Nenhuma contratação ainda. Faça uma como família.</p>';
+ const v=d.cuidadores.map(c=>`<div class="dm-row"><b>${esc(c.nome)} · ${esc(c.cidade)}</b>${c.status=='verificado'?'Com selo Verificado':'Sem selo'}<br><button class="btn alt" onclick="dmVer('${c.id}')">${c.status=='verificado'?'Tirar selo':'Dar selo Verificado'}</button></div>`).join('');
+ dmOpen(`<h3 style="margin:0 0 4px">Simular dono (painel do Supabase)</h3><p class="mut">No site real, estes passos você faz no painel do Supabase.</p><h3 class="s">Contratações</h3>${k}<h3 class="s">Cuidadores</h3>${v}<button class="btn alt" onclick="if(confirm('Apagar os dados desta demonstração e recomeçar?'))__demo.reset()">Reiniciar demonstração</button>`)}
+function dmSet(id,f){const c=__demo.db.contratacoes.find(x=>x.id==id);if(f=='pago')c.pago=true;else{c.pago=true;c.confirmada=true}__demo.save();refresh();dmOwner()}
+function dmVer(id){const c=__demo.db.cuidadores.find(x=>x.id==id);c.status=c.status=='verificado'?'ativo':'verificado';__demo.save();refresh();dmOwner()}
+new MutationObserver(()=>{const m=document.getElementById('modal');if(m&&!m.hidden&&m.querySelector('#pc')&&!m.querySelector('.dm-warn'))m.querySelector('.sheet').insertAdjacentHTML('afterbegin','<div class="dm-warn">DEMONSTRAÇÃO: este Pix é fictício. Não pague.</div>')}).observe(document.getElementById('modal'),{childList:true,subtree:true,attributes:true});
+</script>

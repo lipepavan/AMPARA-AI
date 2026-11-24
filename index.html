@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0f2438">
+<meta name="theme-color" content="#0b2f66">
 <meta name="description" content="Encontre cuidadores em Criciúma e região. A AMPARA AI faz a intermediação entre famílias e cuidadores; o cadastro do cuidador é gratuito.">
 <title>AMPARA AI — Intermediação de cuidadores</title>
 <link rel="canonical" href="%%SITE_URL%%/">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230f2438'/%3E%3Cpath d='M32 50S12 38 12 24a10 10 0 0 1 20-3 10 10 0 0 1 20 3c0 14-20 26-20 26z' fill='%234fd1b6'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b2f66'/%3E%3Cpath d='M32 50S12 38 12 24a10 10 0 0 1 20-3 10 10 0 0 1 20 3c0 14-20 26-20 26z' fill='%236cb4ff'/%3E%3C/svg%3E">
 <meta name="robots" content="index,follow">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="pt_BR">
@@ -15,36 +15,44 @@
 <meta property="og:title" content="AMPARA AI — Intermediação de cuidadores">
 <meta property="og:description" content="Encontre cuidadores. Cadastro gratuito para cuidadores; a família paga só a intermediação.">
 <meta property="og:url" content="%%SITE_URL%%/">
-<meta property="og:image" content="%%SITE_URL%%/og.png">
+<meta property="og:image" content="%%SITE_URL%%/og.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="AMPARA AI — Intermediação de cuidadores">
 <meta name="twitter:description" content="Encontre cuidadores. Cadastro gratuito para cuidadores.">
-<meta name="twitter:image" content="%%SITE_URL%%/og.png">
+<meta name="twitter:image" content="%%SITE_URL%%/og.jpg">
 <style>
-:root{--bg:#f7f5f0;--card:#fff;--ink:#1c2a33;--mut:#5f6b74;--line:#e2dfd7;--tint:#e3f4ef;--td:#0d6e5c;--btn:#0d7a66;--navy:#0f2438;--coral:#c4521f;
+:root{--bg:#f3f7fc;--card:#fff;--ink:#14243a;--mut:#566579;--line:#dbe4f0;--tint:#e6f0fc;--td:#0b5cad;--btn:#1166c9;--navy:#0b2f66;--coral:#c4521f;
 box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#11181d;--card:#1a2229;--ink:#eef0ee;--mut:#9aa4a9;--line:#2b333a;--tint:#12302a;--td:#4fd1b6;--btn:#16806b;--navy:#0a1622;--coral:#f08a5a}}
-:root[data-theme="dark"]{--bg:#11181d;--card:#1a2229;--ink:#eef0ee;--mut:#9aa4a9;--line:#2b333a;--tint:#12302a;--td:#4fd1b6;--btn:#16806b;--navy:#0a1622;--coral:#f08a5a}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1621;--card:#17212e;--ink:#eaf0f7;--mut:#9fb0c3;--line:#26364a;--tint:#14304f;--td:#7bbcff;--btn:#2f80e6;--navy:#081b38;--coral:#f08a5a}}
+:root[data-theme="dark"]{--bg:#0e1621;--card:#17212e;--ink:#eaf0f7;--mut:#9fb0c3;--line:#26364a;--tint:#14304f;--td:#7bbcff;--btn:#2f80e6;--navy:#081b38;--coral:#f08a5a}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--navy);z-index:10}
 header{position:sticky;top:env(safe-area-inset-top,0px);z-index:9;background:var(--navy);display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center;justify-content:space-between;padding:12px 18px}
-header a{color:#fff;text-decoration:none;font-weight:600;font-size:14px}
+header a{color:#fff;text-decoration:none;font-weight:600;font-size:15px;padding:8px 2px}
 .logo{font-size:17px!important;letter-spacing:.5px}
-nav{display:flex;gap:16px}
+nav{display:flex;gap:14px}
+article.card .btn{width:100%;margin-top:6px}
 main{max-width:920px;margin:0 auto;padding:0 18px 40px}
-.hero{background:var(--navy);color:#fff;margin:0 -18px 28px;padding:44px 22px 40px}
-.hero h1{font-size:clamp(26px,6vw,40px);line-height:1.15;margin:0 0 12px;max-width:640px}
-.hero p{margin:0 0 22px;max-width:560px;color:#c9d5dc}
-.btn{display:inline-block;background:var(--btn);color:#fff;border:0;border-radius:12px;padding:12px 20px;font-family:inherit;font-weight:600;font-size:15px;line-height:1.2;text-decoration:none;cursor:pointer}
-.btn.alt{background:transparent;border:1.5px solid currentColor;color:inherit}
-.hero .btn.alt{color:#fff;margin-left:8px}
-.hero{text-align:center}.hero h1,.hero p{margin-left:auto;margin-right:auto}.hero p{margin-bottom:22px}
-.srch{background:var(--card);color:var(--ink);border-radius:16px;padding:16px;max-width:560px;margin:0 auto 14px;text-align:left;display:grid;gap:4px}
-.srch label{margin:8px 0 4px}.srch .btn{width:100%;margin-top:12px;text-align:center}.hero a.lk{color:#fff;font-weight:600;font-size:14px}
+.hero{max-width:1400px;margin:12px auto 24px;padding:0 12px}
+.hero-img{display:block;width:100%;height:auto;border-radius:20px;background:#dfeaf8}
+.hero-box{position:relative;width:calc(100% - 28px);max-width:640px;margin:14px auto 0;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px 20px;box-shadow:0 14px 40px rgba(11,47,102,.2)}
+.hero-box h1{font-size:clamp(26px,7vw,34px);line-height:1.15;margin:0 0 10px;color:var(--ink)}
+.hero-box p{margin:0 0 14px;color:var(--mut)}
+.srch{display:grid;gap:6px}.srch .btn,.hero-box>.btn{width:100%;margin-top:12px}
+@media(min-width:1200px){
+ .hero{position:relative;aspect-ratio:16/9;margin-top:16px;padding:0}
+ .hero-img{position:absolute;inset:0;height:100%;object-fit:cover;border-radius:26px}
+ .hero-box{--card:#fff;--ink:#10243f;--mut:#475a73;--line:#d3dfee;--td:#0b5cad;--btn:#1166c9;position:absolute;top:7%;right:5%;width:min(460px,38%);max-width:none;margin:0;background:rgba(255,255,255,.93);backdrop-filter:blur(8px);padding:24px}
+ .hero-box p{display:none}
+ .srch{grid-template-columns:1fr 1fr;column-gap:12px}.srch .btn{grid-column:1/-1}
+}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;background:var(--btn);color:#fff;border:2px solid var(--btn);border-radius:14px;padding:13px 26px;font-family:inherit;font-weight:700;font-size:17px;line-height:1.2;text-decoration:none;cursor:pointer;box-shadow:0 4px 14px rgba(17,102,201,.32);transition:transform .08s,box-shadow .15s,filter .15s}
+.btn:hover{filter:brightness(1.08);box-shadow:0 6px 18px rgba(17,102,201,.42)}.btn:active{transform:translateY(1px)}.btn:focus-visible{outline:3px solid var(--td);outline-offset:3px}.btn:disabled{opacity:.65;cursor:wait}
+.btn.alt{background:transparent;border:2px solid var(--btn);color:var(--td);box-shadow:none}
 h2{font-size:22px;margin:30px 0 12px}
 .grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
 .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
@@ -63,18 +71,18 @@ input,select,textarea{width:100%;padding:11px 12px;border:1px solid var(--line);
 .chk{display:flex;gap:10px;align-items:flex-start;font-weight:400;margin:8px 0}
 .chk input{width:auto;margin-top:5px}
 .row{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-@media(max-width:520px){.row{grid-template-columns:1fr}.hero .btn.alt{margin:10px 0 0}}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
 .err{color:var(--coral);font-size:14px;margin:8px 0;min-height:20px}
 [hidden]{display:none!important}
 .ov{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;padding:16px;z-index:20}
 .sheet{max-height:92vh;overflow:auto;background:var(--card);border-radius:16px;max-width:420px;width:100%;padding:20px 20px max(20px,env(safe-area-inset-bottom,0px))}
 .sheet .btn{width:100%;margin-top:10px;text-align:center}
-.sheet .btn.alt{color:var(--ink)}
 footer{max-width:920px;margin:0 auto;padding:10px 18px 30px;color:var(--mut);font-size:13px}
 footer a{color:var(--td);font-weight:600}
 .doc h3{margin:18px 0 4px;font-size:16px}.doc p{margin:4px 0}
 
 h3.s{margin:20px 0 2px;font-size:16px}
+label{font-size:15px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:30;background:var(--navy);color:#fff;padding:12px 18px;border-radius:12px;font-size:14px;max-width:90vw;box-shadow:0 6px 24px rgba(0,0,0,.35)}
 .pw{position:relative}.pw input{padding-right:92px}.eye{position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;color:var(--td);font:600 13px/1 inherit;font-family:inherit;padding:10px;cursor:pointer}
 </style>
@@ -84,6 +92,7 @@ h3.s{margin:20px 0 2px;font-size:16px}
 <body>
 <noscript><p style="padding:16px">A AMPARA AI precisa de JavaScript ativado para funcionar.</p></noscript>
 <header><a class="logo" href="#inicio">♥ AMPARA AI</a><nav><a href="#buscar">Buscar</a><a href="#cuidador">Sou cuidador</a><a href="#minhas">Contratações</a><a href="#" id="acc" onclick="acct(event)">Entrar</a></nav></header>
+<div id="heroslot"></div>
 <main id="app"></main>
 <footer>A AMPARA AI apenas aproxima famílias e cuidadores. Não é empregadora e não recebe nem repassa o pagamento do serviço, que é pago direto ao cuidador, depois de realizado. Dados tratados conforme a LGPD. <a href="#termos">Termos de uso</a> · <a href="#privacidade">Privacidade</a>%%FOOTER_CONTACT%%</footer>
 <div id="modal" class="ov" hidden></div>
@@ -108,6 +117,8 @@ const short=n=>{const p=n.trim().split(/\s+/);return p.length>1?p[0]+' '+p[p.len
 const fone=d=>d.length>=11?'('+d.slice(0,2)+') '+d.slice(2,7)+'-'+d.slice(7,11):d;
 const mk=i=>{i.value=fone(i.value.replace(/\D/g,'').slice(0,11))};
 const pr=(c,m)=>+c['p_'+m]||0;
+const moeda=i=>{const d=i.value.replace(/\D/g,'').replace(/^0+/,'').slice(0,8);i.value=d?brl(+d/100):''};
+const val=i=>{const d=i.value.replace(/\D/g,'');return d?+d/100:0};
 let sess=null,rows=[],mine=[],flt={esp:'',cid:''},cur=null;
 
 async function load(){
@@ -120,14 +131,15 @@ async function load(){
 }
 async function refresh(){try{await load()}catch{rows=[];mine=[]}$('#acc').textContent=sess?'Sair':'Entrar';render()}
 
-function home(){return `
-<section class="hero"><h1>Encontre um cuidador de confiança</h1>
+function hero(){return `<section class="hero"><img class="hero-img" src="/hero.jpg" width="1600" height="900" alt="Cuidadora sorrindo ao lado de uma senhora idosa" fetchpriority="high">
+<div class="hero-box"><h1>Encontre um cuidador de confiança</h1>
 <p>Acompanhamento médico, cuidado em casa, pernoite e diárias. Você escolhe o cuidador e a AMPARA AI faz a intermediação com ele.</p>
-<form class="srch" onsubmit="hbusca(event)"><label for="hs">Que tipo de cuidador você procura?</label>
-<select id="hs"><option value="">Todos os tipos</option>${ESP.map(e=>`<option>${e}</option>`).join('')}</select>
-<label for="hc">Cidade</label><input id="hc" placeholder="Ex: Criciúma" value="${esc(flt.cid)}">
+<form class="srch" onsubmit="hbusca(event)"><div><label for="hs">Tipo de cuidador</label>
+<select id="hs"><option value="">Todos os tipos</option>${ESP.map(e=>`<option>${e}</option>`).join('')}</select></div>
+<div><label for="hc">Cidade</label><input id="hc" placeholder="Ex: Criciúma" value="${esc(flt.cid)}"></div>
 <button class="btn" type="submit">Encontrar cuidador</button></form>
-<a class="lk" href="#cuidador">Sou cuidador: cadastre-se grátis →</a></section>
+<a class="btn alt" href="#cuidador">Sou cuidador: cadastre-se grátis</a></div></section>`}
+function home(){return `
 <h2>Como funciona</h2><div class="grid">
 <div class="card"><div class="num">1</div><h3>Escolha</h3><p class="mut">Filtre por cidade e especialidade e veja os valores de cada cuidador.</p></div>
 <div class="card"><div class="num">2</div><h3>Contrate</h3><p class="mut">Informe o serviço e o valor negociado e pague a intermediação via Pix.</p></div>
@@ -140,7 +152,6 @@ function home(){return `
 <div class="card"><h3>Privacidade (LGPD)</h3><p class="mut">Os contatos não são divulgados: toda a intermediação é feita pela AMPARA AI.</p></div></div>
 <h2>Perguntas frequentes</h2>
 <div class="card"><h3>A AMPARA AI contrata o cuidador?</h3><p class="mut">Não. Apenas aproxima as partes.</p>
-<h3>Como é calculado o valor?</h3><p class="mut">${PCT}% do valor negociado com o cuidador, pago só pela família.</p>
 <h3>Quando pago o cuidador?</h3><p class="mut">Direto a ele, depois que o serviço for realizado. Você paga agora só a taxa de intermediação.</p>
 <h3>Como falo com vocês?</h3><p class="mut">${WA?`<a href="https://wa.me/${CFG.wa}" target="_blank" rel="noopener" style="color:var(--td)">Chame no WhatsApp</a>`:'Use o contato indicado no rodapé.'}</p></div>`}
 
@@ -174,16 +185,16 @@ function ctrView(id){
 <div class="row"><div><label for="ci">Cidade</label><input id="ci" required value="${esc(c.cidade)}"></div><div><label for="en">Endereço do atendimento</label><input id="en" required></div></div>
 <label for="ob">Observações para o cuidador</label><textarea id="ob" rows="2"></textarea>
 <label for="wt">Seu WhatsApp</label><input id="wt" type="tel" required inputmode="numeric" placeholder="(48) 90000-0000" oninput="mk(this)">
-<label for="cv">Valor negociado com o cuidador (R$)</label><input id="cv" type="number" step="0.01" min="1" required oninput="calc()">
+<label for="cv">Valor negociado com o cuidador (R$)</label><input id="cv" type="text" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" required oninput="moeda(this);calc()">
 <div class="note" id="fx"></div><div class="err" id="err"></div>
 <button class="btn" type="submit">Pagar intermediação via Pix</button></form>`}
 function upd(){const m=$('#cm').value;$('#qw').style.display=m=='hora'?'block':'none';
- const q=m=='hora'?Math.max(3,+$('#cq').value||3):1;$('#cv').value=(pr(cur,m)*q).toFixed(2);calc()}
-function calc(){const v=+$('#cv').value||0,t=Math.round(v*CFG.rate*100)/100;
- $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI (${PCT}%): <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
+ const q=m=='hora'?Math.max(3,+$('#cq').value||3):1;$('#cv').value=brl(pr(cur,m)*q);calc()}
+function calc(){const v=val($('#cv')),t=Math.round(v*CFG.rate*100)/100;
+ $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI: <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
 async function ctr(ev){ev.preventDefault();
  if(!OK||!sess){$('#err').textContent='Entre ou crie sua conta para contratar.';return}
- const v=+$('#cv').value;if(!(v>0)){$('#err').textContent='Informe o valor negociado.';return}
+ const v=val($('#cv'));if(!(v>0)){$('#err').textContent='Informe o valor negociado.';return}
  const m=$('#cm').value,t=Math.round(v*CFG.rate*100)/100;
  const r=await sb.from('contratacoes').insert({cuidador_id:cur.id,tipo:$('#tp').value,assistido:$('#an').value.trim(),parentesco:$('#pa').value,data:$('#dt').value,hora:$('#hr').value,modalidade:m,qtd:m=='hora'?Math.max(3,+$('#cq').value||3):1,tel_familia:$('#wt').value.replace(/\D/g,''),valor:v,taxa:t,cidade:$('#ci').value.trim(),endereco:$('#en').value.trim(),obs:$('#ob').value.trim()}).select('id').single();
  if(r.error){$('#err').textContent='Não foi possível registrar. Tente novamente.';return}
@@ -192,7 +203,7 @@ async function ctr(ev){ev.preventDefault();
 function minhas(){
  if(!sess)return '<h2>Minhas contratações</h2><div class="card"><p>Entre ou crie sua conta para ver suas contratações.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
  return '<h2>Minhas contratações</h2>'+(mine.length?mine.map(k=>{
-  const st=k.confirmada?`<p class="mut">Cuidador confirmado pela AMPARA AI. Pague o cuidador direto, depois que o serviço for realizado.</p>`:k.pago?`<p class="mut">Pix confirmado. Nossa equipe está fazendo a intermediação com o cuidador (até 2 horas) e avisará você pelo WhatsApp.</p>`:`<p class="mut">Aguardando o Pix. Depois do pagamento, a intermediação é feita em até 2 horas.</p><button class="btn alt" style="color:var(--ink)" onclick="pixm('${k.id}')">Ver dados do Pix</button>`;
+  const st=k.confirmada?`<p class="mut">Cuidador confirmado pela AMPARA AI. Pague o cuidador direto, depois que o serviço for realizado.</p>`:k.pago?`<p class="mut">Pix confirmado. Nossa equipe está fazendo a intermediação com o cuidador (até 2 horas) e avisará você pelo WhatsApp.</p>`:`<p class="mut">Aguardando o Pix. Depois do pagamento, a intermediação é feita em até 2 horas.</p><button class="btn alt" onclick="pixm('${k.id}')">Ver dados do Pix</button>`;
   return `<article class="card"><div class="top"><h3>${esc(k.cuidadores?short(k.cuidadores.nome):'Cuidador')}</h3><span class="tag${k.pago?' ok':''}">${k.confirmada?'Confirmado':k.pago?'Em intermediação':'Aguardando Pix'}</span></div>
 <p class="mut">${esc(k.tipo)} · ${esc(k.data)} ${esc(String(k.hora).slice(0,5))} · ${esc(k.assistido)} (${esc(k.parentesco)})</p>
 <p class="mut">Valor negociado ${brl(k.valor)} · Intermediação ${brl(k.taxa)}</p>${st}</article>`}).join(''):'<p class="mut">Você ainda não contratou nenhum cuidador.</p><a class="btn" href="#buscar">Encontrar cuidador</a>')}
@@ -210,8 +221,8 @@ ${ESP.map(e=>`<label class="chk"><input type="checkbox" name="esp" value="${e}" 
 <div class="row"><div><label for="x">Anos de experiência</label><input id="x" type="number" min="0" max="60" required value="1"></div><div><label for="c">Cidade</label><input id="c" required></div></div>
 <label for="b">Sobre você</label><textarea id="b" rows="3" maxlength="240" placeholder="Experiência, tipos de cuidado, disponibilidade"></textarea>
 <h3 class="s">Seus valores</h3><p class="mut">Informe ao menos um. É o que você cobra da família; nada é descontado de você.</p>
-<div class="row"><div><label for="p0">Por hora (R$)</label><input id="p0" type="number" step="0.01" min="0"></div><div><label for="p1">Diária 8h (R$)</label><input id="p1" type="number" step="0.01" min="0"></div></div>
-<div class="row"><div><label for="p2">Diária 12h (R$)</label><input id="p2" type="number" step="0.01" min="0"></div><div><label for="p3">Diária 24h (R$)</label><input id="p3" type="number" step="0.01" min="0"></div></div>
+<div class="row"><div><label for="p0">Por hora (R$)</label><input id="p0" type="text" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" oninput="moeda(this)"></div><div><label for="p1">Diária 8h (R$)</label><input id="p1" type="text" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" oninput="moeda(this)"></div></div>
+<div class="row"><div><label for="p2">Diária 12h (R$)</label><input id="p2" type="text" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" oninput="moeda(this)"></div><div><label for="p3">Diária 24h (R$)</label><input id="p3" type="text" inputmode="numeric" placeholder="R$ 0,00" autocomplete="off" oninput="moeda(this)"></div></div>
 <h3 class="s">Endereço</h3>
 <label for="ru">Rua</label><input id="ru" required>
 <div class="row"><div><label for="nu">Número</label><input id="nu" required></div><div><label for="tr">Tipo de residência</label><select id="tr" onchange="ap()"><option value="casa">Casa</option><option value="apto">Apartamento</option></select></div></div>
@@ -222,23 +233,35 @@ ${ESP.map(e=>`<label class="chk"><input type="checkbox" name="esp" value="${e}" 
 <input id="cpf" type="file" accept="image/*,.pdf" required style="margin-top:8px">
 <label for="ant">Certidão de antecedentes criminais (opcional; validade de 30 dias)</label><input id="ant" type="file" accept="image/*,.pdf">
 <label class="chk" style="margin-top:16px"><input type="checkbox" required>Autorizo o uso dos meus dados e documentos para verificação e intermediação, conforme a LGPD.</label>
-<div class="err" id="err"></div><button class="btn" type="submit">Cadastrar gratuitamente</button></form>`}
+<div class="err" id="err"></div><button class="btn" type="submit" id="bcad">Cadastrar gratuitamente</button></form>`}
 function sp(){const on=[...document.querySelectorAll('[name=esp]:checked')].some(i=>/Enfermeiro|Técnico/.test(i.value));$('#cr').style.display=on?'block':'none'}
 function ap(){$('#ae').style.display=$('#tr').value=='apto'?'grid':'none'}
-async function cad(ev){ev.preventDefault();const E=$('#err');E.textContent='';
+let cs=null;
+async function cad(ev){ev.preventDefault();const E=$('#err'),B=$('#bcad');E.textContent='';
  if(!OK){E.textContent='Site ainda não configurado.';return}
  const esp=[...document.querySelectorAll('[name=esp]:checked')].map(i=>i.value);
  if(!esp.length){E.textContent='Marque pelo menos uma especialidade.';return}
- const pv=['p0','p1','p2','p3'].map(i=>+$('#'+i).value||0);
+ const pv=['p0','p1','p2','p3'].map(i=>val($('#'+i)));
  if(!pv.some(v=>v>0)){E.textContent='Informe pelo menos um valor.';return}
  const fs=[['rg',$('#rg').files[0]],['comprovante',$('#cpf').files[0]],['antecedentes',$('#ant').files[0]]].filter(f=>f[1]);
  if(fs.some(f=>f[1].size>5242880)){E.textContent='Cada arquivo deve ter até 5 MB.';return}
- const id=crypto.randomUUID();
- let r=await sb.from('cuidadores').insert({id,nome:$('#n').value.trim(),cidade:$('#c').value.trim(),esp,exp:+$('#x').value||0,bio:$('#b').value.trim(),coren:$('#co').value.trim(),p_hora:pv[0]||null,p_8:pv[1]||null,p_12:pv[2]||null,p_24:pv[3]||null});
- if(!r.error)r=await sb.from('cuidadores_contato').insert({cuidador_id:id,tel:$('#t').value.replace(/\D/g,''),email:$('#e').value.trim(),rua:$('#ru').value.trim(),numero:$('#nu').value.trim(),tipo_res:$('#tr').value,apto:$('#an').value.trim(),bloco:$('#bl').value.trim(),comprovante_tipo:$('#cpt').value});
- for(const [k,f] of fs){if(r.error)break;const ext=(f.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');r=await sb.storage.from('docs').upload(id+'/'+k+'.'+ext,f)}
- if(r.error){E.textContent='Não foi possível enviar. Tente novamente.';return}
- $('#app').innerHTML='<h2>Cadastro recebido</h2><div class="card"><p>Cadastro concluído! Seu perfil já aparece na busca. Nossa equipe pode conferir seus documentos e destacar seu perfil como verificado. Não há nenhuma cobrança para você.</p></div>'}
+ if(B.disabled)return;B.disabled=true;const old=B.textContent;B.textContent='Enviando…';
+ cs=cs||{id:crypto.randomUUID(),p:0,c:0,f:{}};
+ const dup=e=>e&&(e.code=='23505'||e.statusCode==409||/duplicate|already exists/i.test(e.message||''));
+ const falha=(etapa,e)=>{E.textContent='Falha ao '+etapa+': '+((e&&e.message)||'erro desconhecido')+'. Toque em Cadastrar de novo para continuar de onde parou.'};
+ try{
+  if(!cs.p){const r=await sb.from('cuidadores').insert({id:cs.id,nome:$('#n').value.trim(),cidade:$('#c').value.trim(),esp,exp:+$('#x').value||0,bio:$('#b').value.trim(),coren:$('#co').value.trim(),p_hora:pv[0]||null,p_8:pv[1]||null,p_12:pv[2]||null,p_24:pv[3]||null});
+   if(r.error&&!dup(r.error))return falha('salvar o perfil',r.error);cs.p=1}
+  if(!cs.c){const r=await sb.from('cuidadores_contato').insert({cuidador_id:cs.id,tel:$('#t').value.replace(/\D/g,''),email:$('#e').value.trim(),rua:$('#ru').value.trim(),numero:$('#nu').value.trim(),tipo_res:$('#tr').value,apto:$('#an').value.trim(),bloco:$('#bl').value.trim(),comprovante_tipo:$('#cpt').value});
+   if(r.error&&!dup(r.error))return falha('salvar o contato',r.error);cs.c=1}
+  for(const [k,f] of fs){if(cs.f[k])continue;
+   const ext=(f.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'');
+   const r=await sb.storage.from('docs').upload(cs.id+'/'+k+'.'+ext,f);
+   if(r.error&&!dup(r.error))return falha('enviar o documento "'+k+'"',r.error);cs.f[k]=1}
+  cs=null;
+  $('#app').innerHTML='<h2>Cadastro recebido</h2><div class="card"><p>Cadastro concluído! Seu perfil já aparece na busca. Nossa equipe pode conferir seus documentos e destacar seu perfil como verificado. Não há nenhuma cobrança para você.</p></div>'
+ }catch(e){E.textContent='Falha de conexão: '+((e&&e.message)||'sem resposta')+'. Verifique a internet e toque em Cadastrar de novo.'}
+ finally{if(B.isConnected){B.disabled=false;B.textContent=old}}}
 
 function ask(msg){const m=$('#modal');m.hidden=false;
  m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 6px">Entrar ou criar conta</h3><p class="mut">${msg}</p>
@@ -315,14 +338,14 @@ function pixm(id){
  const nm=k.cuidadores?short(k.cuidadores.nome):'';
  const msg=encodeURIComponent('Olá! Paguei o Pix de '+brl(k.taxa)+' da intermediação com '+nm+' ('+k.tipo+', '+k.data+'). E-mail da conta: '+(sess?sess.user.email:''));
  m.innerHTML=`<div class="sheet"><h3 style="margin:0 0 4px">Pagar intermediação via Pix</h3><div class="price">${brl(k.taxa)}</div>
-<p class="mut">${PCT}% de ${brl(k.valor)}, valor negociado com ${esc(nm)}.</p>
+<p class="mut">Taxa de intermediação sobre ${brl(k.valor)}, valor negociado com ${esc(nm)}.</p>
 <div style="text-align:center">${qr}</div>
 <p class="mut">Chave Pix (celular): <b>${esc(fone(CFG.pix))}</b> · ${esc(CFG.nome)}</p>
 <label for="pc">Pix copia e cola</label><textarea id="pc" rows="3" readonly onclick="this.select()">${code}</textarea>
 ${/^https?:/.test(CFG.link)?`<a class="btn" href="${esc(CFG.link)}" target="_blank" rel="noopener">Pagar pelo link de pagamento</a>`:''}
 <button class="btn" onclick="const b=this;navigator.clipboard.writeText($('#pc').value).then(()=>b.textContent='Copiado!').catch(()=>$('#pc').select())">Copiar código Pix</button>
 <p class="mut">Depois de pagar, envie o comprovante. A intermediação com o cuidador é feita em até 2 horas após a confirmação.</p>
-${WA?`<a class="btn alt" style="color:var(--ink)" href="https://wa.me/${CFG.wa}?text=${msg}" target="_blank" rel="noopener">Enviar comprovante no WhatsApp</a>`:''}
+${WA?`<a class="btn alt" href="https://wa.me/${CFG.wa}?text=${msg}" target="_blank" rel="noopener">Enviar comprovante no WhatsApp</a>`:''}
 <button class="btn alt" onclick="$('#modal').hidden=true">Fechar</button></div>`}
 
 function legal(t){
@@ -341,6 +364,7 @@ function legal(t){
 <h3>Seus direitos (LGPD)</h3><p class="mut">Você pode pedir acesso, correção ou exclusão dos seus dados. ${ct}</p></div>`}
 function render(){const h=(location.hash||'#inicio').slice(1).split('/');
  const b=OK&&PIXOK?'':'<div class="note" style="margin-top:14px">Site em configuração: variáveis do Supabase, Pix e WhatsApp ainda não definidas no build (veja .env.example).</div>';
+ $('#heroslot').innerHTML=['buscar','cuidador','contrat','minhas','senha','termos','privacidade'].includes(h[0])?'':hero();
  $('#app').innerHTML=(h[0]=='buscar'?busca():h[0]=='cuidador'?cuid():h[0]=='contrat'?ctrView(h[1]):h[0]=='minhas'?minhas():h[0]=='senha'?senha():h[0]=='termos'||h[0]=='privacidade'?legal(h[0]):home())+(h[0]=='termos'||h[0]=='privacidade'?'':b);
  if(h[0]=='buscar')list();
  if(h[0]=='contrat'&&sess&&cur&&$('#cm'))upd();
