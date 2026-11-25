@@ -101,6 +101,8 @@ label{font-size:15px}
 <div id="modal" class="ov" hidden></div>
 <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 <script>
+/* Link de recuperação de senha que caiu na raiz (?code=...): segue para /auth/callback, que troca o código por sessão */
+if(/[?&]code=/.test(location.search)&&location.pathname.indexOf('/auth/')!==0)location.replace('/auth/callback'+location.search+(/[?&]next=/.test(location.search)?'':'&next=senha'));
 /* ===== CONFIGURAÇÃO: NÃO edite aqui. Os valores vêm das variáveis de ambiente no build (veja .env.example) ===== */
 const CFG={url:'%%SUPABASE_URL%%',key:'%%SUPABASE_ANON_KEY%%',pix:'%%PIX_KEY%%',link:'%%PAYMENT_LINK%%',nome:'%%PIX_NAME%%',cidade:'%%PIX_CITY%%',rate:Number('%%FEE_RATE%%')||0.15,wa:'%%WHATSAPP%%',mail:'%%CONTACT_EMAIL%%'};
 /* =============================================================== */
@@ -208,13 +210,13 @@ async function agenda(id){
  ocup=[];if(!OK)return;
  try{const r=await sb.rpc('agenda_cuidador',{cid:id});if(!r.error)ocup=(r.data||[]).map(x=>[new Date(x.inicio),new Date(x.fim)])}catch{}
  const el=$('#ag');
- if(el&&cur&&cur.id==id)el.innerHTML=ocup.length?`<div class="aviso" role="status"><b>Agenda deste cuidador:</b> já tem serviço confirmado em ${ocup.map(b=>esc(fmtI(b[0],b[1]))).join('; ')}. Escolha outro dia ou horário.</div>`:''}
+ if(el&&cur&&cur.id==id)el.innerHTML=ocup.length?`<div class="aviso" role="status"><b>Agenda deste cuidador:</b> já está reservado em ${ocup.map(b=>esc(fmtI(b[0],b[1]))).join('; ')}. Escolha outro dia ou horário.</div>`:''}
 function conflito(){
  const dt=$('#dt'),hr=$('#hr');if(!dt||!hr||!dt.value||!hr.value||!ocup.length)return null;
  const m=$('#cm').value,q=m=='hora'?Math.max(3,+$('#cq').value||3):({'8':8,'12':12,'24':24})[m]||1;
  const a=new Date(dt.value+'T'+hr.value),b=new Date(a.getTime()+q*36e5);
  return ocup.find(x=>a<x[1]&&x[0]<b)||null}
-const MSGOC=c=>'Este cuidador já tem um serviço confirmado nesse horário ('+fmtI(c[0],c[1])+'). Escolha outro dia ou horário.';
+const MSGOC=c=>'Este cuidador já está reservado nesse horário ('+fmtI(c[0],c[1])+'). Escolha outro dia ou horário.';
 function chkAg(){const e=$('#err'),c=conflito();if(e&&(c||e.dataset.ag)){e.textContent=c?MSGOC(c):'';e.dataset.ag=c?'1':''}}
 function calc(){const v=val($('#cv')),t=Math.round(v*CFG.rate*100)/100;
  $('#fx').innerHTML=`Valor negociado: <b>${brl(v)}</b> (pago direto ao cuidador, depois do serviço)<br>Taxa de intermediação AMPARA AI: <b>${brl(t)}</b> (paga agora, via Pix)<br>Total do serviço + taxa: <b>${brl(v+t)}</b>`}
@@ -231,8 +233,8 @@ async function ctr(ev){ev.preventDefault();
 function minhas(){
  if(!sess)return '<h2>Minhas contratações</h2><div class="card"><p>Entre ou crie sua conta para ver suas contratações.</p><button class="btn" onclick="ask(LOGIN)">Entrar</button></div>';
  return '<h2>Minhas contratações</h2>'+(mine.length?mine.map(k=>{
-  const st=k.confirmada?`<p class="mut">Cuidador confirmado pela AMPARA AI. Pague o cuidador direto, depois que o serviço for realizado.</p>`:k.pago?`<p class="mut">Pix confirmado. Nossa equipe está fazendo a intermediação com o cuidador (até 2 horas) e avisará você pelo WhatsApp.</p>`:`<p class="mut">Aguardando o Pix. Depois do pagamento, a intermediação é feita em até 2 horas.</p><button class="btn alt" onclick="pixm('${k.id}')">Ver dados do Pix</button>`;
-  return `<article class="card"><div class="top"><h3>${esc(k.cuidadores?short(k.cuidadores.nome):'Cuidador')}</h3><span class="tag${k.pago?' ok':''}">${k.confirmada?'Confirmado':k.pago?'Em intermediação':'Aguardando Pix'}</span></div>
+  const st=k.cancelada?`<p class="mut">Este pedido foi cancelado. Escolha outro cuidador ou fale com a AMPARA AI pelo WhatsApp.</p><a class="btn alt" href="#buscar">Encontrar outro cuidador</a>`:k.confirmada?`<p class="mut">Cuidador confirmado pela AMPARA AI. Pague o cuidador direto, depois que o serviço for realizado.</p>`:k.pago?`<p class="mut">Pix confirmado. Nossa equipe está fazendo a intermediação com o cuidador (até 2 horas) e avisará você pelo WhatsApp.</p>`:`<p class="mut">Aguardando o Pix. Depois do pagamento, a intermediação é feita em até 2 horas.</p><button class="btn alt" onclick="pixm('${k.id}')">Ver dados do Pix</button>`;
+  return `<article class="card"><div class="top"><h3>${esc(k.cuidadores?short(k.cuidadores.nome):'Cuidador')}</h3><span class="tag${k.pago&&!k.cancelada?' ok':''}">${k.cancelada?'Cancelado':k.confirmada?'Confirmado':k.pago?'Em intermediação':'Aguardando Pix'}</span></div>
 <p class="mut">${esc(k.tipo)} · ${esc(k.data)} ${esc(String(k.hora).slice(0,5))} · ${esc(k.assistido)} (${esc(k.parentesco)})</p>
 <p class="mut">Valor negociado ${brl(k.valor)} · Intermediação ${brl(k.taxa)}</p>${st}</article>`}).join(''):'<p class="mut">Você ainda não contratou nenhum cuidador.</p><a class="btn" href="#buscar">Encontrar cuidador</a>')}
 

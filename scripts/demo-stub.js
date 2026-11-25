@@ -33,7 +33,7 @@
   return q};
  const rpc=async(n,a)=>{if(n!='agenda_cuidador')return{data:null,error:{message:'rpc'}};
   const f=x=>new Date(x.getTime()-x.getTimezoneOffset()*6e4).toISOString().slice(0,19);
-  return{error:null,data:db.contratacoes.filter(r=>r.confirmada&&r.cuidador_id==a.cid).map(r=>{const s=new Date(r.data+'T'+r.hora),h=r.modalidade=='hora'?r.qtd:+r.modalidade;return{inicio:f(s),fim:f(new Date(s.getTime()+h*36e5))}})}};
+  return{error:null,data:db.contratacoes.filter(r=>(r.confirmada||r.pago)&&!r.cancelada&&r.cuidador_id==a.cid).map(r=>{const s=new Date(r.data+'T'+r.hora),h=r.modalidade=='hora'?r.qtd:+r.modalidade;return{inicio:f(s),fim:f(new Date(s.getTime()+h*36e5))}})}};
  const ok=()=>({error:null,data:{session:sess}});
  window.supabase={createClient:()=>({from,rpc,
   auth:{
